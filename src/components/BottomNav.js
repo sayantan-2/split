@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Home, Users, Bell } from "lucide-react";
+import { Home, Users, User } from "lucide-react";
 
 export default function BottomNav({ active = "home" }) {
     return (
@@ -12,9 +12,9 @@ export default function BottomNav({ active = "home" }) {
                 <Users className={`w-6 h-6 ${active === "friends" ? "text-blue-600" : "text-gray-400"}`} />
                 <span className={`text-xs mt-1 ${active === "friends" ? "text-blue-600 font-medium" : "text-gray-400"}`}>Friends</span>
             </Link>
-            <Link href="/activity" className="flex flex-col items-center">
-                <Bell className={`w-6 h-6 ${active === "activity" ? "text-blue-600" : "text-gray-400"}`} />
-                <span className={`text-xs mt-1 ${active === "activity" ? "text-blue-600 font-medium" : "text-gray-400"}`}>Activity</span>
+            <Link href="/account" className="flex flex-col items-center">
+                <User className={`w-6 h-6 ${active === "activity" ? "text-blue-600" : "text-gray-400"}`} />
+                <span className={`text-xs mt-1 ${active === "activity" ? "text-blue-600 font-medium" : "text-gray-400"}`}>Account</span>
             </Link>
         </nav>
     );
