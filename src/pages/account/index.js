@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
     ArrowLeft,
     Bell,
@@ -13,6 +14,7 @@ import {
     Pencil,
 } from "lucide-react";
 import BottomNav from "../../components/BottomNav";
+import { useRouter } from "next/router";
 
 // ToggleSwitch component for slider-style toggles
 function ToggleSwitch({ checked, onChange }) {
@@ -44,23 +46,28 @@ function ChevronRight() {
 export default function AccountPage() {
     const [notifications, setNotifications] = useState(false);
     const [darkMode, setDarkMode] = useState(true);
+    const router = useRouter();
 
     return (
         <div className="bg-gray-50 min-h-screen max-w-md mx-auto pb-24">
             {/* Header */}
             <div className="flex items-center justify-between px-4 pt-8 pb-4 bg-white">
-                <Link href="/" className="p-2 rounded-full hover:bg-gray-100 transition">
+                <button
+                    className="p-2 rounded-full hover:bg-gray-100 transition"
+                    onClick={() => router.back()}
+                >
                     <ArrowLeft className="w-6 h-6 text-gray-900" />
-                </Link>
+                </button>
                 <h1 className="text-3xl font-bold text-gray-900 flex-1 text-center -ml-8">Account</h1>
                 <div className="w-8" />
             </div>
-
             {/* Profile */}
             <div className="flex flex-col items-center mt-4 mb-6 relative">
-                <img
+                <Image
                     src="https://randomuser.me/api/portraits/women/45.jpg"
                     alt="Sophia Chen"
+                    width={128}
+                    height={128}
                     className="w-32 h-32 rounded-full object-cover border-4 border-white shadow"
                 />
                 <button className="absolute right-1/3 top-28 bg-blue-600 rounded-full p-2 border-4 border-white shadow-lg">

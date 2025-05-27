@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Search, ChevronRight, UserPlus } from "lucide-react";
 import BottomNav from "../../components/BottomNav";
 
@@ -62,9 +63,11 @@ export default function FriendsPage() {
                         href={`/friends/${friend.id}`}
                         className="flex items-center px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition cursor-pointer"
                     >
-                        <img
+                        <Image
                             src={friend.avatar}
                             alt={friend.name}
+                            width={48}
+                            height={48}
                             className="w-12 h-12 rounded-full object-cover mr-4"
                         />
                         <div className="flex-1">

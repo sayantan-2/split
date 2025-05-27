@@ -1,30 +1,53 @@
+/* eslint-disable @next/next/no-img-element */
 import React from "react";
 import Link from "next/link";
 import { ArrowLeft, Receipt, CreditCard, Home, User, FileText } from "lucide-react";
 import BottomNav from "../../components/BottomNav";
+
+// Currency formatting utility
+const formatCurrency = (amount, currency = 'USD') => {
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: currency,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(amount);
+};
+
 const friend = {
     name: "Liam",
     username: "liam_123",
     avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+    currency: "USD", // Default currency
     summary: {
         amount: 12.5,
-        status: "owe", // or "owed"
+        status: "owed", // or "owed"
+        currency: "USD",
     },
     history: [
         {
             label: "Dinner",
             date: "12/12/23",
             amount: -8.0,
+            currency: "USD",
         },
         {
             label: "Movie Tickets",
             date: "12/10/23",
             amount: -4.5,
+            currency: "USD",
         },
         {
             label: "Coffee",
             date: "12/05/23",
             amount: 2.5,
+            currency: "EUR",
+        },
+        {
+            label: "Coffee",
+            date: "12/05/23",
+            amount: 2.5,
+            currency: "INR",
         },
     ],
 };
@@ -37,7 +60,7 @@ export default function FriendDetail() {
                 <Link href="/friends" className="p-2 rounded-full hover:bg-gray-100 transition">
                     <ArrowLeft className="w-6 h-6 text-gray-900" />
                 </Link>
-                <h1 className="text-3xl font-bold text-gray-900 flex-1 text-center -ml-8">{friend.name}</h1>
+                {/* <h1 className="text-3xl font-bold text-gray-900 flex-1 text-center -ml-8">{friend.name}</h1> */}
                 <div className="w-8" /> {/* Spacer for symmetry */}
             </div>
 
@@ -61,7 +84,7 @@ export default function FriendDetail() {
                     </div>
                     <div>
                         <div className="text-2xl font-semibold text-gray-900">
-                            ${friend.summary.amount.toFixed(2)}
+                            {formatCurrency(friend.summary.amount, friend.summary.currency)}
                         </div>
                         <div className={`text-base ${friend.summary.status === "owe" ? "text-red-500" : "text-green-500"}`}>
                             {friend.summary.status === "owe"
@@ -92,7 +115,8 @@ export default function FriendDetail() {
                                 className={`text-lg font-semibold ${item.amount < 0 ? "text-red-500" : "text-green-500"
                                     }`}
                             >
-                                {item.amount < 0 ? "-" : "+"}${Math.abs(item.amount).toFixed(2)}
+                                {item.amount < 0 ? "-" : "+"}
+                                {formatCurrency(Math.abs(item.amount), item.currency)}
                             </div>
                         </div>
                     ))}
