@@ -11,6 +11,14 @@ const nextConfig = {
       },
     ],
   },
+  // Increase the API body size limit for file uploads
+  api: {
+    bodyParser: {
+      sizeLimit: '4mb',
+    },
+  },
+  // Disable static export as we're using API routes
+  output: 'standalone',
 };
 
 export default nextConfig;
