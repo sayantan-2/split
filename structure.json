@@ -1,0 +1,133 @@
+{
+  "type": "object",
+  "properties": {
+    "payment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "paymentItems": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "unitPrice": {
+                "type": "number"
+              },
+              "quantity": {
+                "type": "number"
+              },
+              "totalPrice": {
+                "type": "number"
+              },
+              "discountPercentage": {
+                "type": "number"
+              },
+              "taxPercentage": {
+                "type": "number"
+              },
+              "splitEqually": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "User IDs to split equally. For Set behavior, items should be unique. If null/not applicable, omit this field."
+              },
+              "splitByExactAmounts": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "userID": {
+                      "type": "string",
+                      "description": "Id of the user"
+                    },
+                    "amount": {
+                      "type": "number",
+                      "description": "Exact amount assigned to this user"
+                    }
+                  },
+                  "required": ["userID", "amount"]
+                }
+              },
+              "splitByPercentages": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "userID": {
+                      "type": "string",
+                      "description": "Id of the user"
+                    },
+                    "amount": {
+                      "type": "number",
+                      "description": "Percentage assigned to this user (e.g., 20 for 20%)"
+                    }
+                  },
+                  "required": ["userID", "amount"]
+                }
+              },
+              "splitByShares": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "userID": {
+                      "type": "string",
+                      "description": "Id of the user"
+                    },
+                    "amount": {
+                      "type": "number",
+                      "description": "Number of shares assigned to this user"
+                    }
+                  },
+                  "required": ["userID", "amount"]
+                }
+              },
+              "splitByAdjustments": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "userID": {
+                      "type": "string",
+                      "description": "Id of the user"
+                    },
+                    "amount": {
+                      "type": "number",
+                      "description": "Adjustment value for this user (can be positive or negative)"
+                    }
+                  },
+                  "required": ["userID", "amount"]
+                }
+              }
+            },
+            "required": [
+              "name",
+              "unitPrice",
+              "quantity",
+              "totalPrice",
+              "discountPercentage",
+              "taxPercentage"
+            ]
+          }
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": ["id", "name", "currency", "paymentItems"]
+    }
+  },
+  "required": ["payment"]
+}
