@@ -45,50 +45,85 @@ const friends = [
 
 export default function FriendsPage() {
     return (
-        <div className="bg-gray-50 min-h-screen max-w-md mx-auto flex flex-col">
-            {/* Header */}
-            <div className="flex items-center justify-between px-6 pt-8 pb-4 bg-white">
-                <div />
-                <h1 className="text-3xl font-bold text-gray-900">Friends</h1>
-                <button className="p-2 rounded-full hover:bg-gray-100 transition">
-                    <Search className="w-6 h-6 text-gray-900" />
-                </button>
-            </div>
+        <div className="bg-gray-50 min-h-screen">
+            {/* Main Content Area */}
+            <div className="md:ml-64">
+                <div className="max-w-4xl mx-auto">
+                    {/* Header */}
+                    <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-4 sm:pb-6 bg-white md:bg-gray-50">
+                        <div className="md:block hidden" />
+                        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Friends</h1>
+                        <button className="p-2 sm:p-3 rounded-full hover:bg-gray-100 transition-colors shadow-sm bg-white border border-gray-200 md:bg-gray-100 md:border-gray-300">
+                            <Search className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
+                        </button>
+                    </div>
 
-            {/* Friends List */}
-            <div className="flex-1 bg-white">
-                {friends.map((friend) => (
-                    <Link
-                        key={friend.id}
-                        href={`/friends/${friend.id}`}
-                        className="flex items-center px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition cursor-pointer"
-                    >
-                        <Image
-                            src={friend.avatar}
-                            alt={friend.name}
-                            width={48}
-                            height={48}
-                            className="w-12 h-12 rounded-full object-cover mr-4"
-                        />
-                        <div className="flex-1">
-                            <div className="text-lg font-semibold text-gray-900">
-                                {friend.name}
-                            </div>
-                            <div className="text-gray-400 text-base">
-                                {friend.bills} bill{friend.bills > 1 ? "s" : ""}
-                            </div>
+                    {/* Friends List */}
+                    <div className="bg-white md:bg-gray-50 px-4 sm:px-6 lg:px-8">
+                        {/* Mobile List Layout */}
+                        <div className="md:hidden">
+                            {friends.map((friend) => (
+                                <Link
+                                    key={friend.id}
+                                    href={`/friends/${friend.id}`}
+                                    className="flex items-center py-4 border-b border-gray-100 hover:bg-gray-50 transition cursor-pointer"
+                                >
+                                    <Image
+                                        src={friend.avatar}
+                                        alt={friend.name}
+                                        width={48}
+                                        height={48}
+                                        className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover mr-3 sm:mr-4"
+                                    />
+                                    <div className="flex-1">
+                                        <div className="text-base sm:text-lg font-semibold text-gray-900">
+                                            {friend.name}
+                                        </div>
+                                        <div className="text-gray-400 text-sm sm:text-base">
+                                            {friend.bills} bill{friend.bills > 1 ? "s" : ""}
+                                        </div>
+                                    </div>
+                                    <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+                                </Link>
+                            ))}
                         </div>
-                        <ChevronRight className="w-5 h-5 text-gray-400" />
-                    </Link>
-                ))}
-            </div>
 
-            {/* Add Friend Button */}
-            <div className="px-4 pb-24 pt-2 bg-gray-50">
-                <button className="w-full flex items-center justify-center bg-gray-900 text-white font-semibold text-lg py-4 rounded-full shadow-lg hover:bg-gray-800 transition">
-                    <UserPlus className="w-6 h-6 mr-2" />
-                    Add Friend
-                </button>
+                        {/* Desktop Grid Layout */}
+                        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6 py-4">
+                            {friends.map((friend) => (
+                                <Link
+                                    key={friend.id}
+                                    href={`/friends/${friend.id}`}
+                                    className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow cursor-pointer group"
+                                >
+                                    <div className="flex flex-col items-center text-center">
+                                        <Image
+                                            src={friend.avatar}
+                                            alt={friend.name}
+                                            width={64}
+                                            height={64}
+                                            className="w-16 h-16 rounded-full object-cover mb-4 group-hover:scale-105 transition-transform"
+                                        />
+                                        <div className="text-lg font-semibold text-gray-900 mb-1">
+                                            {friend.name}
+                                        </div>
+                                        <div className="text-gray-500 text-sm">
+                                            {friend.bills} bill{friend.bills > 1 ? "s" : ""}
+                                        </div>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Add Friend Button */}
+                    <div className="px-4 sm:px-6 lg:px-8 pb-20 md:pb-8 pt-4 bg-white md:bg-gray-50">
+                        <button className="w-full md:max-w-md md:mx-auto flex items-center justify-center bg-gray-900 text-white font-semibold text-base sm:text-lg py-3 sm:py-4 rounded-xl sm:rounded-2xl shadow-lg hover:bg-gray-800 transition-colors">
+                            <UserPlus className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
+                            Add Friend
+                        </button>
+                    </div>
+                </div>
             </div>
 
             {/* Bottom Navigation */}

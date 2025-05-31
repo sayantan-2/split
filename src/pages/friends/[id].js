@@ -54,74 +54,80 @@ const friend = {
 
 export default function FriendDetail() {
     return (
-        <div className="bg-gray-50 min-h-screen max-w-md mx-auto pb-24">
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 pt-8 pb-4 bg-white">
-                <Link href="/friends" className="p-2 rounded-full hover:bg-gray-100 transition">
-                    <ArrowLeft className="w-6 h-6 text-gray-900" />
-                </Link>
-                {/* <h1 className="text-3xl font-bold text-gray-900 flex-1 text-center -ml-8">{friend.name}</h1> */}
-                <div className="w-8" /> {/* Spacer for symmetry */}
-            </div>
-
-            {/* Avatar & Name */}
-            <div className="flex flex-col items-center mt-4 mb-6">
-                <img
-                    src={friend.avatar}
-                    alt={friend.name}
-                    className="w-32 h-32 rounded-full object-cover mb-4"
-                />
-                <div className="text-2xl font-bold text-gray-900">{friend.name}</div>
-                <div className="text-gray-400 text-lg">@{friend.username}</div>
-            </div>
-
-            {/* Summary */}
-            <div className="px-4 mb-8">
-                <div className="text-xl font-bold text-gray-900 mb-2">Summary</div>
-                <div className="flex items-center bg-white rounded-2xl shadow-sm px-4 py-4 mb-2">
-                    <div className="bg-gray-100 rounded-xl p-3 mr-4">
-                        <CreditCard className="w-8 h-8 text-gray-400" />
+        <div className="bg-gray-50 min-h-screen">
+            {/* Main Content Area */}
+            <div className="md:ml-64">
+                <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 md:pb-8">
+                    {/* Header */}
+                    <div className="flex items-center justify-between pt-6 sm:pt-8 pb-4 sm:pb-6">
+                        <Link href="/friends" className="p-2 rounded-full hover:bg-gray-100 transition-colors bg-white shadow-sm border border-gray-200">
+                            <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 text-gray-900" />
+                        </Link>
+                        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Friend Details</h1>
+                        <div className="w-10 sm:w-12" /> {/* Spacer for symmetry */}
                     </div>
-                    <div>
-                        <div className="text-2xl font-semibold text-gray-900">
-                            {formatCurrency(friend.summary.amount, friend.summary.currency)}
-                        </div>
-                        <div className={`text-base ${friend.summary.status === "owe" ? "text-red-500" : "text-green-500"}`}>
-                            {friend.summary.status === "owe"
-                                ? `You owe ${friend.name}`
-                                : `${friend.name} owes you`}
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            {/* History */}
-            <div className="px-4">
-                <div className="text-xl font-bold text-gray-900 mb-2">History</div>
-                <div className="space-y-4">
-                    {friend.history.map((item, idx) => (
-                        <div
-                            key={idx}
-                            className="flex items-center bg-white rounded-2xl px-4 py-4"
-                        >
+                    {/* Avatar & Name */}
+                    <div className="flex flex-col items-center mt-4 sm:mt-6 mb-6 sm:mb-8">
+                        <img
+                            src={friend.avatar}
+                            alt={friend.name}
+                            className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover mb-4 border-4 border-white shadow-lg"
+                        />
+                        <div className="text-xl sm:text-2xl font-bold text-gray-900">{friend.name}</div>
+                        <div className="text-gray-400 text-base sm:text-lg">@{friend.username}</div>
+                    </div>
+
+                    {/* Summary */}
+                    <div className="mb-6 sm:mb-8">
+                        <div className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Summary</div>
+                        <div className="flex items-center bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 px-4 sm:px-6 py-4 sm:py-6">
                             <div className="bg-gray-100 rounded-xl p-3 mr-4">
-                                <FileText className="w-7 h-7 text-gray-400" />
+                                <CreditCard className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
                             </div>
-                            <div className="flex-1">
-                                <div className="text-lg font-semibold text-gray-900">{item.label}</div>
-                                <div className="text-gray-400 text-base">{item.date}</div>
-                            </div>
-                            <div
-                                className={`text-lg font-semibold ${item.amount < 0 ? "text-red-500" : "text-green-500"
-                                    }`}
-                            >
-                                {item.amount < 0 ? "-" : "+"}
-                                {formatCurrency(Math.abs(item.amount), item.currency)}
+                            <div>
+                                <div className="text-xl sm:text-2xl font-semibold text-gray-900">
+                                    {formatCurrency(friend.summary.amount, friend.summary.currency)}
+                                </div>
+                                <div className={`text-sm sm:text-base ${friend.summary.status === "owe" ? "text-red-500" : "text-green-500"}`}>
+                                    {friend.summary.status === "owe"
+                                        ? `You owe ${friend.name}`
+                                        : `${friend.name} owes you`}
+                                </div>
                             </div>
                         </div>
-                    ))}
+                    </div>
+
+                    {/* History */}
+                    <div>
+                        <div className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">History</div>
+                        <div className="space-y-3 sm:space-y-4">
+                            {friend.history.map((item, idx) => (
+                                <div
+                                    key={idx}
+                                    className="flex items-center bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 px-4 sm:px-6 py-4 sm:py-5 hover:shadow-md transition-shadow"
+                                >
+                                    <div className="bg-gray-100 rounded-xl p-3 mr-4">
+                                        <FileText className="w-5 h-5 sm:w-7 sm:h-7 text-gray-400" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="text-base sm:text-lg font-semibold text-gray-900">{item.label}</div>
+                                        <div className="text-gray-400 text-sm sm:text-base">{item.date}</div>
+                                    </div>
+                                    <div
+                                        className={`text-base sm:text-lg font-semibold ${item.amount < 0 ? "text-red-500" : "text-green-500"
+                                            }`}
+                                    >
+                                        {item.amount < 0 ? "-" : "+"}
+                                        {formatCurrency(Math.abs(item.amount), item.currency)}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
+
             {/* Bottom Navigation */}
             <BottomNav active="friends" />
         </div>
