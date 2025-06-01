@@ -1,133 +1,84 @@
 {
-  "type": "object",
-  "properties": {
-    "payment": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "currency": {
-          "type": "string"
-        },
-        "paymentItems": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "type": "string"
-              },
-              "unitPrice": {
-                "type": "number"
-              },
-              "quantity": {
-                "type": "number"
-              },
-              "totalPrice": {
-                "type": "number"
-              },
-              "discountPercentage": {
-                "type": "number"
-              },
-              "taxPercentage": {
-                "type": "number"
-              },
-              "splitEqually": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                },
-                "description": "User IDs to split equally. For Set behavior, items should be unique. If null/not applicable, omit this field."
-              },
-              "splitByExactAmounts": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "userID": {
-                      "type": "string",
-                      "description": "Id of the user"
-                    },
-                    "amount": {
-                      "type": "number",
-                      "description": "Exact amount assigned to this user"
-                    }
-                  },
-                  "required": ["userID", "amount"]
-                }
-              },
-              "splitByPercentages": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "userID": {
-                      "type": "string",
-                      "description": "Id of the user"
-                    },
-                    "amount": {
-                      "type": "number",
-                      "description": "Percentage assigned to this user (e.g., 20 for 20%)"
-                    }
-                  },
-                  "required": ["userID", "amount"]
-                }
-              },
-              "splitByShares": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "userID": {
-                      "type": "string",
-                      "description": "Id of the user"
-                    },
-                    "amount": {
-                      "type": "number",
-                      "description": "Number of shares assigned to this user"
-                    }
-                  },
-                  "required": ["userID", "amount"]
-                }
-              },
-              "splitByAdjustments": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "userID": {
-                      "type": "string",
-                      "description": "Id of the user"
-                    },
-                    "amount": {
-                      "type": "number",
-                      "description": "Adjustment value for this user (can be positive or negative)"
-                    }
-                  },
-                  "required": ["userID", "amount"]
-                }
-              }
-            },
-            "required": [
-              "name",
-              "unitPrice",
-              "quantity",
-              "totalPrice",
-              "discountPercentage",
-              "taxPercentage"
-            ]
+  "payment": {
+    "currency": "INR",
+    "id": "IN001001259-20-May-18",
+    "name": "Liquor Street Bill",
+    "paymentItems": [
+      {
+        "discountPercentage": 0,
+        "name": "Tandoori chicken",
+        "quantity": 1,
+        "splitByShares": [
+          {
+            "amount": 1,
+            "userID": "amit"
           }
-        },
-        "description": {
-          "type": "string"
-        }
+        ],
+        "taxPercentage": 5,
+        "totalPrice": 309.75,
+        "unitPrice": 295
       },
-      "required": ["id", "name", "currency", "paymentItems"]
-    }
-  },
-  "required": ["payment"]
+      {
+        "discountPercentage": 0,
+        "name": "Lasooni Dal Tadka",
+        "quantity": 1,
+        "splitByShares": [
+          {
+            "amount": 1,
+            "userID": "nina"
+          }
+        ],
+        "taxPercentage": 5,
+        "totalPrice": 288.75,
+        "unitPrice": 275
+      },
+      {
+        "discountPercentage": 0,
+        "name": "HYDERABADI MURG BIRYANI",
+        "quantity": 1,
+        "splitByShares": [
+          {
+            "amount": 1,
+            "userID": "rahul"
+          }
+        ],
+        "taxPercentage": 5,
+        "totalPrice": 393.75,
+        "unitPrice": 375
+      },
+      {
+        "discountPercentage": 0,
+        "name": "Tandoori Roti all food less spicy",
+        "quantity": 2,
+        "splitByShares": [
+          {
+            "amount": 1,
+            "userID": "nina"
+          },
+          {
+            "amount": 1,
+            "userID": "sara"
+          }
+        ],
+        "taxPercentage": 5,
+        "totalPrice": 63,
+        "unitPrice": 30
+      },
+      {
+        "discountPercentage": 0,
+        "name": "Tandoori Roti",
+        "quantity": 1,
+        "splitByShares": [
+          {
+            "amount": 1,
+            "userID": "amit"
+          }
+        ],
+        "taxPercentage": 5,
+        "totalPrice": 31.5,
+        "unitPrice": 30
+      }
+    ],
+    "description": "Bill for Amit, Nina, Rahul, and Sara at Liquor Street."
+  }
 }
