@@ -1,10 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Receipt, ChevronDown, ChevronRight, Users } from 'lucide-react';
-import billData from './data.json'; // Assuming billData is stored in a separate JSON file
 
 // TODO: check if this discount is applied correctly
 const BillSplitter = () => {
+    const [billData, setBillData] = useState(null);
     const [expandedUsers, setExpandedUsers] = useState({});
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        // Load bill data from localStorage
+        const storedData = localStorage.getItem('billData');
+        if (storedData) {
+            try {
+                const parsedData = JSON.parse(storedData);
+                setBillData(parsedData);
+            } catch (error) {
+                console.error('Error parsing bill data:', error);
+            }
+        }
+        setLoading(false);
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+                    <p className="mt-4 text-gray-600">Loading bill data...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!billData) {
+        return (
+            <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+                <div className="text-center">
+                    <p className="text-gray-600">No bill data found. Please go back and process a bill first.</p>
+                </div>
+            </div>
+        );
+    }
 
     // Generate consistent colors for users
     const generateUserColor = (userId) => {

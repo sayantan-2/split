@@ -1,37 +1,16 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
+import { Upload } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { Camera, ArrowLeft, Upload } from 'lucide-react';
-import BottomNav from '../../../components/BottomNav';
-import Payment from '../../../components/Payment';
 
 export default function NewPaymentPage() {
-    const router = useRouter();
-    const { receipt } = router.query;
     const fileInputRef = useRef(null);
+    const router = useRouter();
 
-    const [step, setStep] = useState(receipt === 'true' ? 'upload' : 'manual');
     const [file, setFile] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
     const [imageUrl, setImageUrl] = useState('');
-    const [paymentData, setPaymentData] = useState({
-        id: `payment-${Date.now()}`,
-        name: 'New Payment',
-        currency: 'USD',
-        items: [
-            {
-                name: 'Item 1',
-                unitPrice: 0,
-                quantity: 1,
-                discountPercentage: 0,
-                taxPercentage: 0,
-                splitEqually: null,
-                splitByExactAmounts: null,
-                splitByPercentages: null,
-                splitByShares: null,
-                splitByAdjustments: null,
-            }
-        ]
-    });
+    const [userInput, setUserInput] = useState('');
+    const [isProcessing, setIsProcessing] = useState(false);
 
     const handleFileChange = (e) => {
         if (e.target.files && e.target.files[0]) {
@@ -55,8 +34,6 @@ export default function NewPaymentPage() {
             const data = await response.json();
             if (response.ok) {
                 setImageUrl(data.url);
-                // Auto-proceed to manual entry after successful upload
-                setStep('manual');
             } else {
                 alert(`Upload failed: ${data.error || 'Unknown error'}`);
             }
@@ -68,101 +45,107 @@ export default function NewPaymentPage() {
         }
     };
 
-    const handlePaymentUpdate = (updatedPayment) => {
-        setPaymentData(updatedPayment);
+    const processWithGemini = async () => {
+        if (!imageUrl || !userInput) {
+            alert('Please upload an image and enter text before processing.');
+            return;
+        }
+
+        setIsProcessing(true);
+        try {
+            const response = await fetch('/api/ai/process-gemini', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    imageUrl: imageUrl,
+                    userInput: userInput,
+                }),
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                // Store the result and redirect to output page
+                localStorage.setItem('billData', data.result);
+                router.push('/output');
+            } else {
+                alert(`Processing failed: ${data.error || 'Unknown error'}`);
+            }
+        } catch (error) {
+            console.error('Processing error:', error);
+            alert('Processing failed. Please try again.');
+        } finally {
+            setIsProcessing(false);
+        }
     };
 
-    const handleSavePayment = () => {
-        // Here you would typically save the payment to your backend
-        console.log('Saving payment:', paymentData);
-        // For now, redirect to output page or wherever you want to show the result
-        router.push('/output');
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        processWithGemini();
+    };
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSubmit(e);
+        }
     };
 
     return (
-        <div className="bg-gray-50 min-h-screen">
-            {/* Main Content Area */}
-            <div className="md:ml-64">
-                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 md:pb-8">
-                    {/* Header */}
-                    <div className="flex items-center justify-between pt-6 sm:pt-8 pb-4 sm:pb-6">
-                        <button
-                            className="p-2 rounded-full hover:bg-gray-100 transition-colors bg-white shadow-sm border border-gray-200"
-                            onClick={() => router.back()}
-                        >
-                            <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 text-gray-900" />
-                        </button>
-                        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
-                            New Payment
-                        </h1>
-                        <div className="w-10 sm:w-12" />
-                    </div>
+        <div className="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+            <div className="max-w-2xl w-full">
+                <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+                    <h1 className="text-3xl font-bold text-gray-900 text-center mb-8">
+                        Bill Split Analysis
+                    </h1>
 
-                    {/* Content based on step */}
-                    {step === 'upload' && (
-                        <div className="max-w-2xl mx-auto">
-                            <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
-                                <div className="text-center mb-6">
-                                    <div className="w-16 h-16 mx-auto mb-4 bg-blue-50 rounded-full flex items-center justify-center">
-                                        <Camera className="w-8 h-8 text-blue-600" />
-                                    </div>
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">Upload Receipt</h2>
-                                    <p className="text-gray-600">Take a photo or upload an image of your receipt</p>
-                                </div>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        {/* Image Upload Section */}
+                        <div>
+                            <label className="block text-lg font-semibold text-gray-900 mb-4">
+                                Upload Receipt Image
+                            </label>
 
-                                <div className="space-y-4">
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        ref={fileInputRef}
-                                        onChange={handleFileChange}
-                                        className="hidden"
-                                    />
+                            <input
+                                type="file"
+                                accept="image/*"
+                                ref={fileInputRef}
+                                onChange={handleFileChange}
+                                className="hidden"
+                            />
 
-                                    <button
-                                        onClick={() => fileInputRef.current?.click()}
-                                        className="w-full flex items-center justify-center border-2 border-dashed border-gray-300 rounded-xl py-8 px-6 hover:border-blue-300 hover:bg-blue-50 transition-colors"
-                                    >
-                                        <div className="text-center">
-                                            <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                                            <p className="text-gray-600 font-medium">
-                                                {file ? file.name : 'Choose file or drag and drop'}
-                                            </p>
-                                            <p className="text-sm text-gray-500 mt-1">
-                                                PNG, JPG, JPEG up to 5MB
-                                            </p>
-                                        </div>
-                                    </button>
-
-                                    {file && (
-                                        <button
-                                            onClick={handleUpload}
-                                            disabled={isUploading}
-                                            className="w-full bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-                                        >
-                                            {isUploading ? 'Uploading...' : 'Upload Receipt'}
-                                        </button>
-                                    )}
-
+                            <div className="space-y-4">
+                                <button
+                                    type="button"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="w-full flex items-center justify-center border-2 border-dashed border-gray-300 rounded-xl py-8 px-6 hover:border-blue-300 hover:bg-blue-50 transition-colors"
+                                >
                                     <div className="text-center">
-                                        <button
-                                            onClick={() => setStep('manual')}
-                                            className="text-gray-500 hover:text-gray-700 font-medium transition-colors"
-                                        >
-                                            Skip and enter manually
-                                        </button>
+                                        <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                                        <p className="text-gray-600 font-medium">
+                                            {file ? file.name : 'Choose file or drag and drop'}
+                                        </p>
+                                        <p className="text-sm text-gray-500 mt-1">
+                                            PNG, JPG, JPEG up to 5MB
+                                        </p>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+                                </button>
 
-                    {step === 'manual' && (
-                        <div className="max-w-4xl mx-auto">
-                            <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
+                                {file && (
+                                    <button
+                                        type="button"
+                                        onClick={handleUpload}
+                                        disabled={isUploading}
+                                        className="w-full bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                                    >
+                                        {isUploading ? 'Uploading...' : 'Upload Image'}
+                                    </button>
+                                )}
+
                                 {imageUrl && (
-                                    <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                                        <p className="text-green-800 font-medium mb-2">Receipt uploaded successfully!</p>
+                                    <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                                        <p className="text-green-800 font-medium mb-2">Image uploaded successfully!</p>
                                         <div className="flex items-center space-x-3">
                                             <img
                                                 src={imageUrl}
@@ -170,43 +153,44 @@ export default function NewPaymentPage() {
                                                 className="w-16 h-16 object-cover rounded border"
                                             />
                                             <p className="text-sm text-green-700">
-                                                You can now manually enter or edit the payment details below.
+                                                Image is ready for processing.
                                             </p>
                                         </div>
                                     </div>
                                 )}
-
-                                <Payment
-                                    id={paymentData.id}
-                                    name={paymentData.name}
-                                    currency={paymentData.currency}
-                                    creator={{ id: "current-user", name: "Current User" }}
-                                    items={paymentData.items}
-                                    onUpdate={handlePaymentUpdate}
-                                />
-
-                                <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:gap-4">
-                                    <button
-                                        onClick={() => router.back()}
-                                        className="flex-1 bg-gray-100 text-gray-700 font-medium py-3 px-6 rounded-xl hover:bg-gray-200 transition-colors"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        onClick={handleSavePayment}
-                                        className="flex-1 bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl hover:bg-blue-700 transition-colors"
-                                    >
-                                        Save Payment
-                                    </button>
-                                </div>
                             </div>
                         </div>
-                    )}
+
+                        {/* Text Input Section */}
+                        <div>
+                            <label htmlFor="userInput" className="block text-lg font-semibold text-gray-900 mb-4">
+                                Describe the Split Details
+                            </label>
+                            <textarea
+                                id="userInput"
+                                value={userInput}
+                                onChange={(e) => setUserInput(e.target.value)}
+                                onKeyPress={handleKeyPress}
+                                placeholder="Describe who ordered what and how the bill should be split..."
+                                rows={4}
+                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-gray-900 placeholder-gray-500"
+                            />
+                            <p className="text-sm text-gray-500 mt-2">
+                                Press Enter or click Submit to process
+                            </p>
+                        </div>
+
+                        {/* Submit Button */}
+                        <button
+                            type="submit"
+                            disabled={isProcessing || !imageUrl || !userInput}
+                            className="w-full bg-gray-900 text-white font-semibold py-4 px-6 rounded-xl hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-lg"
+                        >
+                            {isProcessing ? 'Processing...' : 'Analyze Bill Split'}
+                        </button>
+                    </form>
                 </div>
             </div>
-
-            {/* Bottom Navigation */}
-            <BottomNav active="payment" />
         </div>
     );
 }
