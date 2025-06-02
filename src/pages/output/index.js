@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Receipt, ChevronDown, ChevronRight, Users } from 'lucide-react';
-import billData from './billData.json'; // Assuming billData is stored in a separate JSON file
+import billData from './data.json'; // Assuming billData is stored in a separate JSON file
 
+// TODO: check if this discount is applied correctly
 const BillSplitter = () => {
     const [expandedUsers, setExpandedUsers] = useState({});
 

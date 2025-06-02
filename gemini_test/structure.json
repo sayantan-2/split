@@ -1,0 +1,137 @@
+{
+  "type": "object",
+  "properties": {
+    "payment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the payment"
+        },
+        "name": {
+          "type": "string",
+          "description": "Short descriptive name of the bill or payment event"
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency code (e.g., INR, USD)"
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional description of the payment context"
+        },
+        "paymentItems": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Name of the item/product/service. Exclude tax/service charge/discount references."
+              },
+              "unitPrice": {
+                "type": "number",
+                "description": "Price for a single unit of the item"
+              },
+              "quantity": {
+                "type": "number",
+                "description": "Number of units purchased"
+              },
+              "totalPrice": {
+                "type": "number",
+                "description": "Final price after quantity multiplication (unitPrice × quantity)"
+              },
+              "discountPercentage": {
+                "type": "number",
+                "description": "Discount applied on the item as percentage"
+              },
+              "taxPercentage": {
+                "type": "number",
+                "description": "Tax rate (e.g., GST, VAT) as a percentage"
+              },
+              "splitByShares": {
+                "type": "array",
+                "description": "UserID and their number of shares for this item",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "userID": {
+                      "type": "string"
+                    },
+                    "amount": {
+                      "type": "number"
+                    }
+                  },
+                  "required": ["userID", "amount"]
+                }
+              },
+              "splitEqually": {
+                "type": "array",
+                "description": "User IDs to split equally",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "splitByExactAmounts": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "userID": {
+                      "type": "string"
+                    },
+                    "amount": {
+                      "type": "number"
+                    }
+                  },
+                  "required": ["userID", "amount"]
+                }
+              },
+              "splitByPercentages": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "userID": {
+                      "type": "string"
+                    },
+                    "amount": {
+                      "type": "number"
+                    }
+                  },
+                  "required": ["userID", "amount"]
+                }
+              },
+              "splitByAdjustments": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "userID": {
+                      "type": "string"
+                    },
+                    "amount": {
+                      "type": "number"
+                    }
+                  },
+                  "required": ["userID", "amount"]
+                }
+              }
+            },
+            "required": [
+              "name",
+              "unitPrice",
+              "quantity",
+              "totalPrice",
+              "discountPercentage",
+              "taxPercentage",
+              "splitByShares"
+            ]
+          }
+        }
+      },
+      "required": ["id", "name", "currency", "paymentItems"]
+    }
+  },
+  "required": ["payment"]
+}
