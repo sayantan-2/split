@@ -268,58 +268,56 @@ export default function FriendsPage() {
                             <>
                                 {/* Mobile List Layout */}
                                 <div className="md:hidden">
-                                    {friends.map((friend) => (
-                                        <Link
-                                            key={friend.id}
-                                            href={`/friends/${friend.id}`}
-                                            className="flex items-center py-4 border-b border-gray-100 hover:bg-gray-50 transition cursor-pointer"
-                                        >
-                                            <Image
-                                                src={friend.avatar}
-                                                alt={friend.name}
-                                                width={48}
-                                                height={48}
-                                                className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover mr-3 sm:mr-4"
-                                            />                                            <div className="flex-1">
-                                                <div className="text-base sm:text-lg font-semibold text-gray-900">
-                                                    {friend.name}
-                                                </div>
-                                                <div className="text-gray-400 text-sm sm:text-base">
-                                                    @{friend.username}
-                                                </div>
+                                    {friends.map((friend) => (<Link
+                                        key={friend.id}
+                                        href={`/friends/${friend.username}`}
+                                        className="flex items-center py-4 border-b border-gray-100 hover:bg-gray-50 transition cursor-pointer"
+                                    >
+                                        <Image
+                                            src={friend.avatar}
+                                            alt={friend.name}
+                                            width={48}
+                                            height={48}
+                                            className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover mr-3 sm:mr-4"
+                                        />                                            <div className="flex-1">
+                                            <div className="text-base sm:text-lg font-semibold text-gray-900">
+                                                {friend.name}
                                             </div>
-                                            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
-                                        </Link>
+                                            <div className="text-gray-400 text-sm sm:text-base">
+                                                @{friend.username}
+                                            </div>
+                                        </div>
+                                        <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+                                    </Link>
                                     ))}
                                 </div>
 
                                 {/* Desktop Grid Layout */}
                                 <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6 py-4">
-                                    {friends.map((friend) => (
-                                        <Link
-                                            key={friend.id}
-                                            href={`/friends/${friend.id}`}
-                                            className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow cursor-pointer group"
-                                        >
-                                            <div className="flex flex-col items-center text-center">
-                                                <Image
-                                                    src={friend.avatar}
-                                                    alt={friend.name}
-                                                    width={64}
-                                                    height={64}
-                                                    className="w-16 h-16 rounded-full object-cover mb-4 group-hover:scale-105 transition-transform"
-                                                />                                                <div className="text-lg font-semibold text-gray-900 mb-1">
-                                                    {friend.name}
-                                                </div>
-                                                <div className="text-gray-500 text-sm mb-2">
-                                                    @{friend.username}
-                                                </div>
-                                                <div className="text-gray-400 text-xs">
-                                                    {friend.bills} bill
-                                                    {friend.bills > 1 ? "s" : ""}
-                                                </div>
+                                    {friends.map((friend) => (<Link
+                                        key={friend.id}
+                                        href={`/friends/${friend.username}`}
+                                        className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow cursor-pointer group"
+                                    >
+                                        <div className="flex flex-col items-center text-center">
+                                            <Image
+                                                src={friend.avatar}
+                                                alt={friend.name}
+                                                width={64}
+                                                height={64}
+                                                className="w-16 h-16 rounded-full object-cover mb-4 group-hover:scale-105 transition-transform"
+                                            />                                                <div className="text-lg font-semibold text-gray-900 mb-1">
+                                                {friend.name}
                                             </div>
-                                        </Link>
+                                            <div className="text-gray-500 text-sm mb-2">
+                                                @{friend.username}
+                                            </div>
+                                            <div className="text-gray-400 text-xs">
+                                                {friend.bills} bill
+                                                {friend.bills > 1 ? "s" : ""}
+                                            </div>
+                                        </div>
+                                    </Link>
                                     ))}
                                 </div>
                             </>

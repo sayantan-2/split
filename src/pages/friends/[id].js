@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { ArrowLeft, Receipt, CreditCard, Home, User, FileText } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import { useAuthRedirect, AuthLoadingSpinner } from "../../lib/auth";
@@ -15,53 +16,74 @@ const formatCurrency = (amount, currency = 'USD') => {
     }).format(amount);
 };
 
-const friend = {
-    name: "Liam",
-    username: "liam_123",
-    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-    currency: "USD", // Default currency
-    summary: {
-        amount: 12.5,
-        status: "owed", // or "owed"
-        currency: "USD",
-    },
-    history: [
-        {
-            label: "Dinner",
-            date: "12/12/23",
-            amount: -8.0,
-            currency: "USD",
-        },
-        {
-            label: "Movie Tickets",
-            date: "12/10/23",
-            amount: -4.5,
-            currency: "USD",
-        },
-        {
-            label: "Coffee",
-            date: "12/05/23",
-            amount: 2.5,
-            currency: "EUR",
-        },
-        {
-            label: "Coffee",
-            date: "12/05/23",
-            amount: 2.5,
-            currency: "INR",
-        },
-    ],
-};
-
 export default function FriendDetail() {
     const { session, status } = useAuthRedirect();
+    const router = useRouter();
+    const { id } = router.query; // This will be either username or id
+    const [friend, setFriend] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    if (status === "loading") {
+    useEffect(() => {
+        if (session && id) {
+            fetchFriendData();
+        }
+    }, [session, id]);
+
+    const fetchFriendData = async () => {
+        try {
+            setLoading(true);
+            // Try to fetch by username first
+            const response = await fetch(`/api/friends/${id}`);
+
+            if (response.ok) {
+                const data = await response.json();
+                setFriend(data.friend);
+            } else {
+                const errorData = await response.json();
+                setError(errorData.error || 'Failed to fetch friend data');
+            }
+        } catch (error) {
+            console.error('Error fetching friend data:', error);
+            setError('Failed to fetch friend data');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (status === "loading" || loading) {
         return <AuthLoadingSpinner />;
     }
 
     if (!session) {
         return null; // Will redirect to signin
+    }
+
+    if (error) {
+        return (
+            <div className="bg-gray-50 min-h-screen">
+                <div className="md:ml-64">
+                    <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 md:pb-8">
+                        <div className="flex items-center justify-between pt-6 sm:pt-8 pb-4 sm:pb-6">
+                            <Link href="/friends" className="p-2 rounded-full hover:bg-gray-100 transition-colors bg-white shadow-sm border border-gray-200">
+                                <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 text-gray-900" />
+                            </Link>
+                            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Friend Details</h1>
+                            <div className="w-10 sm:w-12" />
+                        </div>
+                        <div className="text-center py-12">
+                            <div className="text-red-500 text-lg mb-2">Error</div>
+                            <div className="text-gray-500 text-sm">{error}</div>
+                        </div>
+                    </div>
+                </div>
+                <BottomNav active="friends" />
+            </div>
+        );
+    }
+
+    if (!friend) {
+        return <AuthLoadingSpinner />;
     }
 
     return (
@@ -107,34 +129,39 @@ export default function FriendDetail() {
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    {/* History */}
+                    </div>                    {/* History */}
                     <div>
                         <div className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">History</div>
-                        <div className="space-y-3 sm:space-y-4">
-                            {friend.history.map((item, idx) => (
-                                <div
-                                    key={idx}
-                                    className="flex items-center bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 px-4 sm:px-6 py-4 sm:py-5 hover:shadow-md transition-shadow"
-                                >
-                                    <div className="bg-gray-100 rounded-xl p-3 mr-4">
-                                        <FileText className="w-5 h-5 sm:w-7 sm:h-7 text-gray-400" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <div className="text-base sm:text-lg font-semibold text-gray-900">{item.label}</div>
-                                        <div className="text-gray-400 text-sm sm:text-base">{item.date}</div>
-                                    </div>
+                        {friend.history && friend.history.length > 0 ? (
+                            <div className="space-y-3 sm:space-y-4">
+                                {friend.history.map((item, idx) => (
                                     <div
-                                        className={`text-base sm:text-lg font-semibold ${item.amount < 0 ? "text-red-500" : "text-green-500"
-                                            }`}
+                                        key={idx}
+                                        className="flex items-center bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 px-4 sm:px-6 py-4 sm:py-5 hover:shadow-md transition-shadow"
                                     >
-                                        {item.amount < 0 ? "-" : "+"}
-                                        {formatCurrency(Math.abs(item.amount), item.currency)}
+                                        <div className="bg-gray-100 rounded-xl p-3 mr-4">
+                                            <FileText className="w-5 h-5 sm:w-7 sm:h-7 text-gray-400" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="text-base sm:text-lg font-semibold text-gray-900">{item.label}</div>
+                                            <div className="text-gray-400 text-sm sm:text-base">{item.date}</div>
+                                        </div>
+                                        <div
+                                            className={`text-base sm:text-lg font-semibold ${item.amount < 0 ? "text-red-500" : "text-green-500"
+                                                }`}
+                                        >
+                                            {item.amount < 0 ? "-" : "+"}
+                                            {formatCurrency(Math.abs(item.amount), item.currency)}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-8">
+                                <div className="text-gray-400 text-base">No shared expenses yet</div>
+                                <div className="text-gray-500 text-sm mt-1">Start by creating a bill together!</div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
