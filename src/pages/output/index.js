@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Receipt, ChevronDown, ChevronRight, Users } from 'lucide-react';
+import { useAuthRedirect, AuthLoadingSpinner } from '@/lib/auth';
 
 // TODO: check if this discount is applied correctly
 const BillSplitter = () => {
+    const { session, status } = useAuthRedirect();
     const [billData, setBillData] = useState(null);
     const [expandedUsers, setExpandedUsers] = useState({});
     const [loading, setLoading] = useState(true);
@@ -21,15 +23,13 @@ const BillSplitter = () => {
         setLoading(false);
     }, []);
 
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
-                    <p className="mt-4 text-gray-600">Loading bill data...</p>
-                </div>
-            </div>
-        );
+    if (status === "loading" || loading) {
+        const message = status === "loading" ? "Authenticating..." : "Loading bill data...";
+        return <AuthLoadingSpinner message={message} />;
+    }
+
+    if (!session) {
+        return null; // Will redirect to signin
     }
 
     if (!billData) {

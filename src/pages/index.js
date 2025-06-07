@@ -1,6 +1,8 @@
 import React from "react";
-import { Plus, ChevronRight, Home, Users, Bell, FileText } from "lucide-react";
+import { Plus, ChevronRight, Home, Users, Bell, FileText, LogOut, User } from "lucide-react";
 import BottomNav from "../components/BottomNav";
+import { signOut } from "next-auth/react";
+import { useAuthRedirect, AuthLoadingSpinner } from "@/lib/auth";
 
 const splits = [
   {
@@ -27,6 +29,16 @@ const splits = [
 ];
 
 export default function HomePage() {
+  const { session, status } = useAuthRedirect();
+
+  if (status === "loading") {
+    return <AuthLoadingSpinner />;
+  }
+
+  if (!session) {
+    return null; // Will redirect to signin
+  }
+
   return (
     <div className="bg-gray-50 min-h-screen">
       {/* Main Content Area */}
@@ -35,12 +47,26 @@ export default function HomePage() {
           {/* Header */}
           <div className="flex items-center justify-between pt-6 sm:pt-8 pb-4 sm:pb-6">
             <div className="md:block hidden" />
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
-              Splits
-            </h1>
-            <button className="p-2 sm:p-3 rounded-full hover:bg-gray-100 transition-colors shadow-sm bg-white border border-gray-200">
-              <Plus className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
-            </button>
+            <div className="text-center">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+                Splits
+              </h1>
+              <p className="text-sm text-gray-600 mt-1">
+                Welcome back, {session.user.name || session.user.email}!
+              </p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <button className="p-2 sm:p-3 rounded-full hover:bg-gray-100 transition-colors shadow-sm bg-white border border-gray-200">
+                <Plus className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
+              </button>
+              <button
+                onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+                className="p-2 sm:p-3 rounded-full hover:bg-gray-100 transition-colors shadow-sm bg-white border border-gray-200 text-red-600"
+                title="Sign Out"
+              >
+                <LogOut className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+            </div>
           </div>
 
           {/* Recent Section */}

@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-  images: {
+  reactStrictMode: true, images: {
     remotePatterns: [
       {
         protocol: 'https',
@@ -9,13 +8,13 @@ const nextConfig = {
         port: '',
         pathname: '/api/portraits/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'ui-avatars.com',
+        port: '',
+        pathname: '/api/**',
+      },
     ],
-  },
-  // Increase the API body size limit for file uploads
-  api: {
-    bodyParser: {
-      sizeLimit: '4mb',
-    },
   },
   // Disable static export as we're using API routes
   output: 'standalone',

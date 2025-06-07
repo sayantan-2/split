@@ -1,16 +1,26 @@
 import { useState, useRef } from 'react';
 import { Upload } from 'lucide-react';
 import { useRouter } from 'next/router';
+import { useAuthRedirect, AuthLoadingSpinner } from '@/lib/auth';
 
 export default function NewPaymentPage() {
     const fileInputRef = useRef(null);
     const router = useRouter();
+    const { session, status } = useAuthRedirect();
 
     const [file, setFile] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
     const [imageUrl, setImageUrl] = useState('');
     const [userInput, setUserInput] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
+
+    if (status === "loading") {
+        return <AuthLoadingSpinner />;
+    }
+
+    if (!session) {
+        return null; // Will redirect to signin
+    }
 
     const handleFileChange = (e) => {
         if (e.target.files && e.target.files[0]) {

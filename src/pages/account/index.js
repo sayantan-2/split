@@ -12,9 +12,12 @@ import {
     FileText,
     Shield,
     Pencil,
+    LogOut,
 } from "lucide-react";
-import BottomNav from "../../components/BottomNav";
+import BottomNav from "@/components/BottomNav";
 import { useRouter } from "next/router";
+import { signOut } from "next-auth/react";
+import { useAuthRedirect, AuthLoadingSpinner } from "../../lib/auth";
 
 // ToggleSwitch component for slider-style toggles
 function ToggleSwitch({ checked, onChange }) {
@@ -47,6 +50,19 @@ export default function AccountPage() {
     const [notifications, setNotifications] = useState(false);
     const [darkMode, setDarkMode] = useState(true);
     const router = useRouter();
+    const { session, status } = useAuthRedirect();
+
+    if (status === "loading") {
+        return <AuthLoadingSpinner />;
+    }
+
+    if (!session) {
+        return null; // Will redirect to signin
+    }
+
+    const handleSignOut = () => {
+        signOut({ callbackUrl: '/auth/signin' });
+    };
 
     return (
         <div className="bg-gray-50 min-h-screen">
@@ -64,22 +80,22 @@ export default function AccountPage() {
                         <div className="md:block hidden" />
                         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Account</h1>
                         <div className="w-10 sm:w-12 md:hidden" />
-                    </div>
-
-                    {/* Profile */}
+                    </div>                    {/* Profile */}
                     <div className="flex flex-col items-center mt-4 sm:mt-6 mb-6 sm:mb-8 relative">
-                        <Image
-                            src="https://randomuser.me/api/portraits/women/45.jpg"
-                            alt="Sophia Chen"
-                            width={128}
-                            height={128}
-                            className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-white shadow-lg"
-                        />
+                        <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center border-4 border-white shadow-lg">
+                            <span className="text-white text-2xl sm:text-3xl md:text-4xl font-bold">
+                                {session.user.name ? session.user.name.charAt(0).toUpperCase() : session.user.email.charAt(0).toUpperCase()}
+                            </span>
+                        </div>
                         <button className="absolute right-1/3 sm:right-1/4 md:right-1/3 top-20 sm:top-28 md:top-32 bg-blue-600 rounded-full p-2 sm:p-3 border-4 border-white shadow-lg hover:bg-blue-700 transition-colors">
                             <Pencil className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                         </button>
-                        <div className="text-xl sm:text-2xl font-bold text-gray-900 mt-4">Sophia Chen</div>
-                        <div className="text-gray-400 text-base sm:text-lg">@sophia_chen</div>
+                        <div className="text-xl sm:text-2xl font-bold text-gray-900 mt-4">
+                            {session.user.name || 'User'}
+                        </div>
+                        <div className="text-gray-400 text-base sm:text-lg">
+                            {session.user.email}
+                        </div>
                     </div>
 
                     {/* Settings */}
@@ -150,12 +166,14 @@ export default function AccountPage() {
                                 <ChevronRight />
                             </div>
                         </div>
-                    </div>
-
-                    {/* Log Out Button */}
+                    </div>                    {/* Log Out Button */}
                     <div className="mt-6 sm:mt-8">
-                        <button className="w-full md:max-w-sm md:mx-auto flex items-center justify-center bg-white text-red-500 font-semibold text-base sm:text-lg py-3 sm:py-4 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 hover:bg-red-50 hover:shadow-md transition-all">
-                            Log Out
+                        <button
+                            onClick={handleSignOut}
+                            className="w-full md:max-w-sm md:mx-auto flex items-center justify-center bg-white text-red-500 font-semibold text-base sm:text-lg py-3 sm:py-4 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 hover:bg-red-50 hover:shadow-md transition-all"
+                        >
+                            <LogOut className="w-5 h-5 mr-2" />
+                            Sign Out
                         </button>
                     </div>
                 </div>

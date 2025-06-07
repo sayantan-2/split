@@ -2,7 +2,8 @@
 import React from "react";
 import Link from "next/link";
 import { ArrowLeft, Receipt, CreditCard, Home, User, FileText } from "lucide-react";
-import BottomNav from "../../components/BottomNav";
+import BottomNav from "@/components/BottomNav";
+import { useAuthRedirect, AuthLoadingSpinner } from "../../lib/auth";
 
 // Currency formatting utility
 const formatCurrency = (amount, currency = 'USD') => {
@@ -53,6 +54,16 @@ const friend = {
 };
 
 export default function FriendDetail() {
+    const { session, status } = useAuthRedirect();
+
+    if (status === "loading") {
+        return <AuthLoadingSpinner />;
+    }
+
+    if (!session) {
+        return null; // Will redirect to signin
+    }
+
     return (
         <div className="bg-gray-50 min-h-screen">
             {/* Main Content Area */}
