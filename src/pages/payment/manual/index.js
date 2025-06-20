@@ -235,7 +235,7 @@ export default function ManualPaymentPage() {
                                     value={billName}
                                     onChange={(e) => setBillName(e.target.value)}
                                     placeholder="e.g., Dinner at Italian Restaurant"
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 border text-gray-700 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     required
                                 />
                             </div>
@@ -253,7 +253,7 @@ export default function ManualPaymentPage() {
                                             value={billAmount}
                                             onChange={(e) => setBillAmount(e.target.value)}
                                             placeholder="0.00"
-                                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full pl-10 pr-4 py-3 border text-gray-700 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                             required
                                         />
                                     </div>
@@ -265,7 +265,7 @@ export default function ManualPaymentPage() {
                                     <select
                                         value={currency}
                                         onChange={(e) => setCurrency(e.target.value)}
-                                        className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="px-4 py-3 border border-gray-300 text-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     >
                                         <option value="USD">USD</option>
                                         <option value="EUR">EUR</option>
@@ -291,8 +291,8 @@ export default function ManualPaymentPage() {
                                         key={friend.id}
                                         onClick={() => toggleFriend(friend)}
                                         className={`flex items-center p-3 border rounded-xl cursor-pointer transition-colors ${selectedFriends.some(f => f.id === friend.id)
-                                                ? 'border-blue-500 bg-blue-50'
-                                                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                                            ? 'border-blue-500 bg-blue-50'
+                                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                                             }`}
                                     >                                            <Image
                                             src={`https://ui-avatars.com/api/?name=${encodeURIComponent(friend.name)}&background=6366f1&color=fff`}
@@ -322,7 +322,7 @@ export default function ManualPaymentPage() {
                                 <label className="block text-sm font-medium text-gray-700 mb-3">
                                     How do you want to split?
                                 </label>
-                                <div className="space-y-2">
+                                <div className="space-y-2 text-gray-700">
                                     <label className="flex items-center">
                                         <input
                                             type="radio"
@@ -372,7 +372,7 @@ export default function ManualPaymentPage() {
                                             height={32}
                                             className="rounded-full"
                                         />
-                                            <span className="flex-1 text-sm font-medium">{friend.name}</span>
+                                            <span className="flex-1 text-sm text-gray-700 font-medium">{friend.name}</span>
                                             <div className="relative">
                                                 {splitMethod === 'exact' && (
                                                     <>
@@ -382,7 +382,7 @@ export default function ManualPaymentPage() {
                                                             step="0.01"
                                                             value={exactAmounts[friend.id] || ''}
                                                             onChange={(e) => updateExactAmount(friend.id, e.target.value)}
-                                                            className="w-24 pl-7 pr-2 py-2 border border-gray-300 rounded-lg text-sm"
+                                                            className="w-24 pl-7 pr-2 py-2 border text-gray-700 border-gray-300 rounded-lg text-sm"
                                                             placeholder="0.00"
                                                         />
                                                     </>
@@ -395,7 +395,7 @@ export default function ManualPaymentPage() {
                                                             max="100"
                                                             value={percentages[friend.id] || ''}
                                                             onChange={(e) => updatePercentage(friend.id, e.target.value)}
-                                                            className="w-16 px-2 py-2 border border-gray-300 rounded-lg text-sm"
+                                                            className="w-16 px-2 py-2 border text-gray-700 border-gray-300 rounded-lg text-sm"
                                                             placeholder="0"
                                                         />
                                                         <span className="ml-1 text-sm text-gray-500">%</span>
@@ -412,7 +412,7 @@ export default function ManualPaymentPage() {
                                                 {session.user.name?.charAt(0) || session.user.email?.charAt(0)}
                                             </span>
                                         </div>
-                                        <span className="flex-1 text-sm font-medium">You</span>
+                                        <span className="flex-1 text-sm text-gray-700 font-medium">You</span>
                                         <div className="text-sm font-medium text-gray-700">
                                             {splitMethod === 'exact' && (
                                                 <span>${splitData?.currentUser?.toFixed(2) || '0.00'}</span>
@@ -428,7 +428,7 @@ export default function ManualPaymentPage() {
 
                         {/* Split Preview */}
                         {selectedFriends.length > 0 && splitData && (
-                            <div className="bg-gray-50 rounded-xl p-4">
+                            <div className="bg-gray-50 text-gray-700 rounded-xl p-4">
                                 <h4 className="text-sm font-medium text-gray-700 mb-3">Split Preview:</h4>
                                 <div className="space-y-2 text-sm">
                                     <div className="flex justify-between">
