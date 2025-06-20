@@ -1,7 +1,19 @@
 import { GoogleGenAI } from '@google/genai';
 import * as fs from 'node:fs';
 import path from 'path';
-import { config } from './config';
+import yaml from 'js-yaml';
+
+// Load configuration from YAML file
+const loadConfig = () => {
+    try {
+        const configPath = path.join(process.cwd(), 'src', 'pages', 'api', 'ai', 'config.yaml');
+        const configFile = fs.readFileSync(configPath, 'utf8');
+        return yaml.load(configFile);
+    } catch (error) {
+        console.error('Error loading config.yaml:', error);
+        throw new Error('Failed to load AI configuration');
+    }
+};
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
@@ -11,9 +23,9 @@ export default async function handler(req, res) {
 
     if (!imageUrl || !userInput) {
         return res.status(400).json({ error: 'Image URL and user input are required' });
-    }
+    } try {
+        const config = loadConfig();
 
-    try {
         const ai = new GoogleGenAI({
             apiKey: process.env.GEMINI_API_KEY,
         });
@@ -24,7 +36,7 @@ export default async function handler(req, res) {
             encoding: "base64",
         });
 
-        const model = 'gemini-2.5-flash-preview-05-20';
+        const model = 'gemini-2.5-flash';
         const contents = [
             {
                 role: 'user',

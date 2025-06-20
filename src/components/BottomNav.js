@@ -14,11 +14,9 @@ export default function BottomNav({ active = "home" }) {
     const handleScanReceiptClick = () => {
         setShowPaymentModal(false);
         router.push('/payment/new?receipt=true');
-    };
-
-    const handleContinueWithoutReceiptClick = () => {
+    }; const handleContinueWithoutReceiptClick = () => {
         setShowPaymentModal(false);
-        router.push('/payment/new');
+        router.push('/payment/manual');
     };
     return (
         <>

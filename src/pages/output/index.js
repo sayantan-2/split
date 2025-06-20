@@ -81,16 +81,16 @@ const BillSplitter = () => {
         });
 
         return { subtotal, totalTax, total: subtotal + totalTax };
-    };
-
-    // Calculate user details
+    };    // Calculate user details
     const calculateUserDetails = () => {
         const userDetails = {};
 
         billData.payment.paymentItems.forEach(item => {
             const totalShares = item.splitByShares.reduce((sum, share) => sum + share.amount, 0);
-            const preTaxPerShare = item.totalPrice / totalShares;
-            const taxPerShare = (preTaxPerShare * item.taxPercentage) / 100;
+
+            // Calculate the full amount per share (including tax)
+            const fullAmountWithTax = item.totalPrice * (1 + (item.taxPercentage || 0) / 100);
+            const amountPerShare = fullAmountWithTax / totalShares;
 
             item.splitByShares.forEach(share => {
                 if (share.amount === 0) return;
@@ -104,20 +104,21 @@ const BillSplitter = () => {
                     };
                 }
 
-                const userSubtotal = preTaxPerShare * share.amount;
-                const userTax = taxPerShare * share.amount;
-                const userTotal = userSubtotal + userTax;
+                // Calculate user's share amounts
+                const userTotalAmount = amountPerShare * share.amount;
+                const userSubtotal = (item.totalPrice / totalShares) * share.amount;
+                const userTax = userTotalAmount - userSubtotal;
 
                 userDetails[share.userID].subtotal += userSubtotal;
                 userDetails[share.userID].tax += userTax;
-                userDetails[share.userID].total += userTotal;
+                userDetails[share.userID].total += userTotalAmount;
 
                 userDetails[share.userID].items.push({
                     name: item.name,
                     shares: share.amount,
                     totalQuantity: item.quantity,
                     unitPrice: item.unitPrice,
-                    userAmount: userTotal,
+                    userAmount: userTotalAmount,
                     isShared: item.splitByShares.filter(s => s.amount > 0).length > 1
                 });
             });
