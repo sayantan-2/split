@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Receipt, ChevronDown, ChevronRight, Users } from 'lucide-react';
+import { Receipt, ChevronDown, ChevronRight, Users, Send } from 'lucide-react';
 import { useAuthRedirect, AuthLoadingSpinner } from '@/lib/auth';
+import { useRouter } from 'next/router';
 
 // TODO: check if this discount is applied correctly
 const BillSplitter = () => {
+    const router = useRouter();
     const { session, status } = useAuthRedirect();
     const [billData, setBillData] = useState(null);
     const [expandedUsers, setExpandedUsers] = useState({});
     const [loading, setLoading] = useState(true);
+    const [sendingRequests, setSendingRequests] = useState(false);
 
     useEffect(() => {
         // Load bill data from localStorage
@@ -78,10 +81,59 @@ const BillSplitter = () => {
         billData.payment.paymentItems.forEach(item => {
             subtotal += item.totalPrice;
             totalTax += (item.totalPrice * item.taxPercentage) / 100;
-        });
+        }); return { subtotal, totalTax, total: subtotal + totalTax };
+    };    // Send payment requests to all users
+    const sendPaymentRequests = async () => {
+        if (!session?.user) return;
 
-        return { subtotal, totalTax, total: subtotal + totalTax };
-    };    // Calculate user details
+        setSendingRequests(true);
+        try {
+            const userDetails = calculateUserDetails();
+            const totals = calculateTotals();
+
+            // Prepare participants data
+            const participants = Object.entries(userDetails).map(([userId, details]) => ({
+                userId: userId,
+                total: details.total
+            }));
+
+            // Only proceed if there are other participants
+            const otherParticipants = participants.filter(p => p.userId !== session.user.id && p.total > 0);
+            if (otherParticipants.length === 0) {
+                alert('No payment requests to send - you are the only one with charges.');
+                return;
+            }
+
+            // Save bill and create payment requests
+            const response = await fetch('/api/bills/save-and-request', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    billData: {
+                        payment: billData.payment,
+                        totals: totals
+                    },
+                    participants: participants
+                }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                alert(`Successfully created bill and sent ${data.paymentRequests.length} payment requests!`);
+                router.push('/payments');
+            } else {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to create payment requests');
+            }
+        } catch (error) {
+            console.error('Error sending payment requests:', error);
+            alert(`Failed to send payment requests: ${error.message}`);
+        } finally {
+            setSendingRequests(false);
+        }
+    };// Calculate user details
     const calculateUserDetails = () => {
         const userDetails = {};
 
@@ -264,7 +316,24 @@ const BillSplitter = () => {
                                     </div>
                                 ))}
                             </div>
-                        </div>
+                        </div>                        {/* Payment Request Section */}
+                        {session && Object.keys(userDetails).length > 1 && (
+                            <div className="pt-4 border-t border-dashed border-gray-300">
+                                <div className="text-center">
+                                    <button
+                                        onClick={sendPaymentRequests}
+                                        disabled={sendingRequests}
+                                        className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                                    >
+                                        <Send className="w-5 h-5" />
+                                        {sendingRequests ? 'Sending Payment Requests...' : 'Send Payment Requests'}
+                                    </button>
+                                    <p className="text-xs text-gray-500 mt-2">
+                                        This will send payment requests to all participants
+                                    </p>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Footer */}
                         <div className="text-center pt-4 border-t border-dashed border-gray-300">

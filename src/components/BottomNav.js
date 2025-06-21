@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { Home, Users, User, Plus, Camera, FileText, X } from "lucide-react";
+import { Home, Users, User, Plus, Camera, FileText, X, CreditCard } from "lucide-react";
 
 export default function BottomNav({ active = "home" }) {
     const router = useRouter();
@@ -19,10 +19,9 @@ export default function BottomNav({ active = "home" }) {
         router.push('/payment/manual');
     };
     return (
-        <>
-            {/* Mobile Bottom Navigation */}
+        <>            {/* Mobile Bottom Navigation */}
             <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-10 shadow-lg md:hidden">
-                <div className="flex justify-between items-center px-4 py-2">
+                <div className="flex justify-between items-center px-2 py-2">
                     <Link href="/" className="flex flex-col items-center min-w-0 flex-1 py-1">
                         <Home className={`w-5 h-5 transition-colors ${active === "home" ? "text-blue-600" : "text-gray-400"}`} />
                         <span className={`text-xs mt-1 transition-colors truncate ${active === "home" ? "text-blue-600 font-medium" : "text-gray-400"}`}>
@@ -34,7 +33,23 @@ export default function BottomNav({ active = "home" }) {
                         <span className={`text-xs mt-1 transition-colors truncate ${active === "friends" ? "text-blue-600 font-medium" : "text-gray-400"}`}>
                             Friends
                         </span>
-                    </Link>                    <Link href="/account" className="flex flex-col items-center min-w-0 flex-1 py-1">
+                    </Link>
+
+                    {/* Center Plus Button */}
+                    <button
+                        onClick={handleNewPaymentClick}
+                        className="bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-colors mx-2"
+                    >
+                        <Plus className="w-6 h-6" />
+                    </button>
+
+                    <Link href="/payments" className="flex flex-col items-center min-w-0 flex-1 py-1">
+                        <CreditCard className={`w-5 h-5 transition-colors ${active === "payments" ? "text-blue-600" : "text-gray-400"}`} />
+                        <span className={`text-xs mt-1 transition-colors truncate ${active === "payments" ? "text-blue-600 font-medium" : "text-gray-400"}`}>
+                            Payments
+                        </span>
+                    </Link>
+                    <Link href="/account" className="flex flex-col items-center min-w-0 flex-1 py-1">
                         <User className={`w-5 h-5 transition-colors ${active === "account" ? "text-blue-600" : "text-gray-400"}`} />
                         <span className={`text-xs mt-1 transition-colors truncate ${active === "account" ? "text-blue-600 font-medium" : "text-gray-400"}`}>
                             Account

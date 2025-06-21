@@ -25,7 +25,17 @@ async function setupDatabase() {
         const friendsSqlPath = path.join(process.cwd(), 'database', 'friends_schema.sql')
         const friendsSqlContent = fs.readFileSync(friendsSqlPath, 'utf-8')
         await pool.query(friendsSqlContent)
-        console.log('Friends schema applied successfully!')
+        console.log('Friends schema applied successfully!')        // Read and execute the payments schema
+        const paymentsSqlPath = path.join(process.cwd(), 'database', 'payments_schema.sql')
+        const paymentsSqlContent = fs.readFileSync(paymentsSqlPath, 'utf-8')
+        await pool.query(paymentsSqlContent)
+        console.log('Payments schema applied successfully!')
+
+        // Read and execute the bills schema
+        const billsSqlPath = path.join(process.cwd(), 'database', 'bills_schema.sql')
+        const billsSqlContent = fs.readFileSync(billsSqlPath, 'utf-8')
+        await pool.query(billsSqlContent)
+        console.log('Bills schema applied successfully!')
 
         console.log('Database setup completed successfully!')
 
