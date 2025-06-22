@@ -149,7 +149,7 @@ const PaymentsPage = () => {
             hour: '2-digit',
             minute: '2-digit'
         });
-    }; const getContextualStatus = (request, currentUserId) => {
+    };    const getContextualStatus = (request, currentUserId) => {
         const isPayee = request.payee_id === currentUserId; // The one who receives money (usually sent the request)
         const isPayer = request.payer_id === currentUserId; // The one who pays money (usually received the request)
         const status = request.status;
@@ -158,7 +158,7 @@ const PaymentsPage = () => {
             case 'sent':
                 return isPayee ? 'Sent' : 'Waiting for your response';
             case 'pending':
-                return isPayee ? 'Pending' : 'Waiting for your response';
+                return isPayee ? 'Sent' : 'Waiting for your response';
             case 'accepted':
                 return isPayee ? 'They accepted' : 'You accepted';
             case 'completed':
