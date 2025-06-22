@@ -16,15 +16,15 @@ async function checkTables() {
     const client = await pool.connect();
     try {
         const tables = [
-            'users', 
-            'friendships', 
-            'payment_requests', 
-            'bills', 
-            'bill_items', 
-            'bill_participants', 
-            'bill_item_splits', 
-            'sessions', 
-            'accounts', 
+            'users',
+            'friendships',
+            'payment_requests',
+            'bills',
+            'bill_items',
+            'bill_participants',
+            'bill_item_splits',
+            'sessions',
+            'accounts',
             'verification_tokens',
             'users_nextauth'
         ];
@@ -45,10 +45,10 @@ async function checkTables() {
         }
 
         console.log('\n📋 Analysis Summary:');
-        
+
         // Check which empty tables should have data
         const shouldHaveData = ['bills', 'bill_items', 'bill_participants', 'bill_item_splits'];
-        
+
         console.log('\n🤔 Empty Tables Analysis:');
         for (const table of shouldHaveData) {
             try {

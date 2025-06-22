@@ -19,14 +19,14 @@ const pool = new Pool({
 
 async function cleanupDatabase() {
     const client = await pool.connect();
-    
+
     try {
         console.log('🧹 Starting database cleanup...\n');
 
         // List of unused tables to drop
         const tablesToDrop = [
             'settlements',
-            'payment_reminders', 
+            'payment_reminders',
             'payment_disputes'
         ];
 
@@ -58,13 +58,13 @@ async function cleanupDatabase() {
         // Check what tables remain
         console.log('\n📋 Remaining tables in database:');
         const result = await client.query(`
-            SELECT table_name 
-            FROM information_schema.tables 
-            WHERE table_schema = 'public' 
+            SELECT table_name
+            FROM information_schema.tables
+            WHERE table_schema = 'public'
             AND table_type = 'BASE TABLE'
             ORDER BY table_name
         `);
-        
+
         result.rows.forEach(row => {
             console.log(`  • ${row.table_name}`);
         });
@@ -72,12 +72,12 @@ async function cleanupDatabase() {
         // Check what views remain
         console.log('\n📋 Remaining views in database:');
         const viewResult = await client.query(`
-            SELECT table_name 
-            FROM information_schema.views 
+            SELECT table_name
+            FROM information_schema.views
             WHERE table_schema = 'public'
             ORDER BY table_name
         `);
-        
+
         if (viewResult.rows.length > 0) {
             viewResult.rows.forEach(row => {
                 console.log(`  • ${row.table_name} (view)`);

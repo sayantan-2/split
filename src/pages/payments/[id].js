@@ -77,6 +77,8 @@ const PaymentRequestDetail = () => {
                 return <Clock className="w-5 h-5 text-yellow-500" />;
             case 'accepted':
                 return <CheckCircle className="w-5 h-5 text-blue-500" />;
+            case 'paid_pending_confirmation':
+                return <Clock className="w-5 h-5 text-orange-500" />;
             case 'completed':
                 return <CheckCircle className="w-5 h-5 text-green-500" />;
             case 'rejected':
@@ -88,15 +90,15 @@ const PaymentRequestDetail = () => {
             default:
                 return <Clock className="w-5 h-5 text-gray-500" />;
         }
-    };
-
-    const getStatusColor = (status) => {
+    }; const getStatusColor = (status) => {
         switch (status) {
             case 'pending':
             case 'sent':
                 return 'bg-yellow-50 text-yellow-700 border-yellow-200';
             case 'accepted':
                 return 'bg-blue-50 text-blue-700 border-blue-200';
+            case 'paid_pending_confirmation':
+                return 'bg-orange-50 text-orange-700 border-orange-200';
             case 'completed':
                 return 'bg-green-50 text-green-700 border-green-200';
             case 'rejected':
@@ -131,8 +133,10 @@ const PaymentRequestDetail = () => {
                 return isPayee ? 'You sent a request. Waiting for their response.' : 'You have a new payment request.';
             case 'accepted':
                 return isPayee ? 'They agreed to pay. Waiting for them to mark as paid.' : 'You accepted. You can now mark this as paid.';
+            case 'paid_pending_confirmation':
+                return isPayee ? 'They marked as paid. Confirm if you received the money.' : 'You marked as paid. Waiting for them to confirm receipt.';
             case 'completed':
-                return isPayee ? 'They marked this as paid.' : 'You marked this as paid.';
+                return isPayee ? 'Payment completed. You confirmed receipt.' : 'Payment completed. They confirmed receipt.';
             case 'rejected':
                 return isPayee ? 'They declined the request.' : 'You declined the request.';
             case 'cancelled':
@@ -145,11 +149,13 @@ const PaymentRequestDetail = () => {
             case 'sent':
                 return isPayee ? 'Sent' : 'Waiting for your response';
             case 'pending':
-                return isPayee ? 'Pending' : 'Waiting for your response';
+                return isPayee ? '' : 'Waiting for your response';
             case 'accepted':
                 return isPayee ? 'They accepted' : 'You accepted';
+            case 'paid_pending_confirmation':
+                return isPayee ? 'Confirm payment received' : 'Marked as paid';
             case 'completed':
-                return isPayee ? 'They paid you' : 'You paid';
+                return isPayee ? 'Payment confirmed' : 'Payment confirmed';
             case 'rejected':
                 return isPayee ? 'They declined' : 'You declined';
             case 'cancelled':
@@ -170,15 +176,14 @@ const PaymentRequestDetail = () => {
         return null;
     }
     // Workflow permissions
-    const isPayer = paymentRequest.payer_id === session.user.id;
-    const isPayee = paymentRequest.payee_id === session.user.id;
-
-    // Workflow permissions
+    const isPayer = paymentRequest.payer_id === parseInt(session.user.id);
+    const isPayee = paymentRequest.payee_id === parseInt(session.user.id);    // Workflow permissions
     const canAccept = isPayer && ['pending', 'sent'].includes(paymentRequest.status);
     const canReject = isPayer && ['pending', 'sent'].includes(paymentRequest.status);
     const canCancel = isPayee && ['pending', 'sent'].includes(paymentRequest.status);
     const canMarkPaid = isPayer && ['accepted'].includes(paymentRequest.status);
-    const canDispute = ['completed'].includes(paymentRequest.status); // Anyone can dispute? adjust if needed
+    const canConfirmPayment = isPayee && ['paid_pending_confirmation'].includes(paymentRequest.status);
+    const canDispute = ['completed', 'paid_pending_confirmation'].includes(paymentRequest.status); // Anyone can dispute
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -229,15 +234,24 @@ const PaymentRequestDetail = () => {
                                 <CheckCircle className="w-4 h-4" />
                                 Accept Request
                             </button>
-                        )}
-                        {canMarkPaid && (
+                        )}                        {canMarkPaid && (
                             <button
-                                onClick={() => updatePaymentStatus('completed')}
+                                onClick={() => updatePaymentStatus('paid_pending_confirmation')}
                                 disabled={actionLoading}
                                 className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                             >
                                 <DollarSign className="w-4 h-4" />
                                 Mark as Paid
+                            </button>
+                        )}
+                        {canConfirmPayment && (
+                            <button
+                                onClick={() => updatePaymentStatus('completed')}
+                                disabled={actionLoading}
+                                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                            >
+                                <CheckCircle className="w-4 h-4" />
+                                Confirm Received
                             </button>
                         )}
                         {canReject && (

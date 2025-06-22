@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS payment_requests (
     amount DECIMAL(10,2) NOT NULL,
     currency VARCHAR(3) DEFAULT 'USD',
     description TEXT,
-    status VARCHAR(50) DEFAULT 'sent' CHECK (status IN ('pending', 'sent', 'accepted', 'paid_pending_confirmation', 'completed', 'rejected', 'cancelled', 'disputed')),
+    status VARCHAR(20) DEFAULT 'sent' CHECK (status IN ('pending', 'sent', 'accepted', 'completed', 'rejected', 'cancelled', 'disputed')),
 
     -- Payment method and external references
     payment_method VARCHAR(50), -- 'manual', 'stripe', 'paypal', 'venmo', etc.

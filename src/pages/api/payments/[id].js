@@ -88,9 +88,57 @@ export default async function handler(req, res) {
             // Build update query dynamically
             const updates = [];
             const values = [];
-            let paramCount = 0;
+            let paramCount = 0; if (status !== undefined) {
+                // Validate status transitions based on user role
+                const isPayer = request.payer_id === userId;
+                const isPayee = request.payee_id === userId;
 
-            if (status !== undefined) {
+                // Status transition rules
+                const validTransitions = {
+                    'sent': {
+                        payer: ['accepted', 'rejected'],
+                        payee: ['cancelled']
+                    },
+                    'pending': {
+                        payer: ['accepted', 'rejected'],
+                        payee: ['cancelled']
+                    },
+                    'accepted': {
+                        payer: ['paid_pending_confirmation'],
+                        payee: ['cancelled']
+                    },
+                    'paid_pending_confirmation': {
+                        payer: ['disputed'],
+                        payee: ['completed', 'disputed']
+                    },
+                    'completed': {
+                        payer: ['disputed'],
+                        payee: ['disputed']
+                    },
+                    'rejected': {
+                        payer: [],
+                        payee: []
+                    },
+                    'cancelled': {
+                        payer: [],
+                        payee: []
+                    },
+                    'disputed': {
+                        payer: [],
+                        payee: []
+                    }
+                };
+
+                const currentStatus = request.status;
+                const userRole = isPayer ? 'payer' : 'payee';
+                const allowedStatuses = validTransitions[currentStatus]?.[userRole] || [];
+
+                if (!allowedStatuses.includes(status)) {
+                    return res.status(400).json({
+                        error: `Invalid status transition from ${currentStatus} to ${status} for ${userRole}. Allowed: ${allowedStatuses.join(', ')}`
+                    });
+                }
+
                 paramCount++;
                 updates.push(`status = $${paramCount}`);
                 values.push(status);

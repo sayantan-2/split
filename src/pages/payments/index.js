@@ -63,9 +63,7 @@ const PaymentsPage = () => {
         if (session) {
             fetchPaymentRequests();
         }
-    }, [session, fetchPaymentRequests]);
-
-    const handleQuickAction = async (requestId, newStatus) => {
+    }, [session, fetchPaymentRequests]); const handleQuickAction = async (requestId, newStatus) => {
         try {
             const response = await fetch(`/api/payments/${requestId}`, {
                 method: 'PATCH',
@@ -78,12 +76,13 @@ const PaymentsPage = () => {
             if (response.ok) {
                 // Refresh the payment requests list
                 await fetchPaymentRequests();
-
                 // Show success message
                 const statusLabels = {
                     'accepted': 'accepted',
                     'rejected': 'declined',
-                    'completed': 'marked as paid'
+                    'paid_pending_confirmation': 'marked as paid',
+                    'completed': 'confirmed as received',
+                    'disputed': 'disputed'
                 };
                 alert(`Payment request ${statusLabels[newStatus]} successfully!`);
             } else {
@@ -94,15 +93,15 @@ const PaymentsPage = () => {
             console.error('Error updating payment status:', error);
             alert(`Failed to update payment: ${error.message}`);
         }
-    };
-
-    const getStatusIcon = (status) => {
+    }; const getStatusIcon = (status) => {
         switch (status) {
             case 'pending':
             case 'sent':
                 return <Clock className="w-4 h-4 text-yellow-500" />;
             case 'accepted':
                 return <CheckCircle className="w-4 h-4 text-blue-500" />;
+            case 'paid_pending_confirmation':
+                return <Clock className="w-4 h-4 text-orange-500" />;
             case 'completed':
                 return <CheckCircle className="w-4 h-4 text-green-500" />;
             case 'rejected':
@@ -114,15 +113,15 @@ const PaymentsPage = () => {
             default:
                 return <Clock className="w-4 h-4 text-gray-500" />;
         }
-    };
-
-    const getStatusColor = (status) => {
+    }; const getStatusColor = (status) => {
         switch (status) {
             case 'pending':
             case 'sent':
                 return 'bg-yellow-50 text-yellow-700 border-yellow-200';
             case 'accepted':
                 return 'bg-blue-50 text-blue-700 border-blue-200';
+            case 'paid_pending_confirmation':
+                return 'bg-orange-50 text-orange-700 border-orange-200';
             case 'completed':
                 return 'bg-green-50 text-green-700 border-green-200';
             case 'rejected':
@@ -149,7 +148,7 @@ const PaymentsPage = () => {
             hour: '2-digit',
             minute: '2-digit'
         });
-    };    const getContextualStatus = (request, currentUserId) => {
+    }; const getContextualStatus = (request, currentUserId) => {
         const isPayee = request.payee_id === currentUserId; // The one who receives money (usually sent the request)
         const isPayer = request.payer_id === currentUserId; // The one who pays money (usually received the request)
         const status = request.status;
@@ -158,9 +157,11 @@ const PaymentsPage = () => {
             case 'sent':
                 return isPayee ? 'Sent' : 'Waiting for your response';
             case 'pending':
-                return isPayee ? 'Sent' : 'Waiting for your response';
+                return isPayee ? '' : 'Waiting for your response';
             case 'accepted':
                 return isPayee ? 'They accepted' : 'You accepted';
+            case 'paid_pending_confirmation':
+                return isPayee ? 'Confirm payment received' : 'Marked as paid';
             case 'completed':
                 return isPayee ? 'They paid you' : 'You paid';
             case 'rejected':
@@ -239,8 +240,7 @@ const PaymentsPage = () => {
             {/* Filter */}
             <div className="max-w-4xl mx-auto px-4 py-4">
                 <div className="flex items-center gap-4">
-                    <Filter className="w-4 h-4 text-gray-400" />
-                    <select
+                    <Filter className="w-4 h-4 text-gray-400" />                    <select
                         value={filterStatus}
                         onChange={(e) => setFilterStatus(e.target.value)}
                         className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
@@ -248,6 +248,7 @@ const PaymentsPage = () => {
                         <option value="">All Statuses</option>
                         <option value="sent">Sent</option>
                         <option value="accepted">Accepted</option>
+                        <option value="paid_pending_confirmation">Paid (Pending Confirmation)</option>
                         <option value="completed">Completed</option>
                         <option value="rejected">Rejected</option>
                         <option value="cancelled">Cancelled</option>
@@ -285,18 +286,23 @@ const PaymentsPage = () => {
                     <div className="space-y-4">                        {getDisplayRequests().map((request) => {                            // Convert IDs to numbers for comparison
                         const currentUserId = parseInt(session.user.id);
                         const isPayer = request.payer_id === currentUserId;
+                        const isPayee = request.payee_id === currentUserId;
                         const canAccept = isPayer && ['sent', 'pending'].includes(request.status);
                         const canReject = isPayer && ['sent', 'pending'].includes(request.status);
                         const canMarkPaid = isPayer && request.status === 'accepted';
-                        const needsAction = canAccept || canReject || canMarkPaid;
+                        const canConfirmPayment = isPayee && request.status === 'paid_pending_confirmation';
+                        const needsAction = canAccept || canReject || canMarkPaid || canConfirmPayment;
 
                         return (
                             <div key={request.id} className={`bg-white rounded-lg border p-4 hover:shadow-md transition-shadow ${needsAction ? 'border-blue-200 ring-1 ring-blue-100' : 'border-gray-200'
-                                }`}>
-                                {needsAction && (
+                                }`}>                                {needsAction && (
                                     <div className="mb-3 p-2 bg-blue-50 rounded-lg border border-blue-200">
                                         <p className="text-sm text-blue-800 font-medium">
-                                            🔔 Action Required: {request.payee_name} requested a payment
+                                            🔔 Action Required: {
+                                                canConfirmPayment
+                                                    ? `${request.payer_name} marked payment as sent`
+                                                    : `${request.payee_name} requested a payment`
+                                            }
                                         </p>
                                     </div>
                                 )}
@@ -304,13 +310,13 @@ const PaymentsPage = () => {
                                 <div className="flex items-start justify-between">
                                     <div className="flex items-start gap-3 flex-1">                                            {/* Direction indicator */}
                                         <div className={`p-2 rounded-full ${request.payer_id === currentUserId
-                                            ? 'bg-red-50'
-                                            : 'bg-green-50'
+                                            ? 'bg-green-50'
+                                            : 'bg-red-50'
                                             }`}>
                                             {request.payer_id === currentUserId ? (
-                                                <ArrowUpRight className="w-4 h-4 text-red-600" />
-                                            ) : (
                                                 <ArrowDownLeft className="w-4 h-4 text-green-600" />
+                                            ) : (
+                                                <ArrowUpRight className="w-4 h-4 text-red-600" />
                                             )}
                                         </div>
 
@@ -370,14 +376,29 @@ const PaymentsPage = () => {
                                                     Decline
                                                 </button>
                                             </div>
-                                        )}
-                                        {canMarkPaid && (
+                                        )}                                        {canMarkPaid && (
                                             <button
-                                                onClick={() => handleQuickAction(request.id, 'completed')}
+                                                onClick={() => handleQuickAction(request.id, 'paid_pending_confirmation')}
                                                 className="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors mt-2"
                                             >
                                                 Mark Paid
                                             </button>
+                                        )}
+                                        {canConfirmPayment && (
+                                            <div className="flex gap-2 mt-2">
+                                                <button
+                                                    onClick={() => handleQuickAction(request.id, 'completed')}
+                                                    className="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors"
+                                                >
+                                                    Confirm Received
+                                                </button>
+                                                <button
+                                                    onClick={() => handleQuickAction(request.id, 'disputed')}
+                                                    className="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors"
+                                                >
+                                                    Dispute
+                                                </button>
+                                            </div>
                                         )}
 
                                         <Link
