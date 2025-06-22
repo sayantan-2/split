@@ -329,10 +329,12 @@ const PaymentsPage = () => {
                             const canReject = isPayer && ['sent', 'pending'].includes(request.status);
                             const canMarkPaid = isPayer && request.status === 'accepted';
                             const canConfirmPayment = isPayee && request.status === 'paid_pending_confirmation';
-                            const needsAction = canAccept || canReject || canMarkPaid || canConfirmPayment; return (
-                                <div key={request.id} className={`bg-white rounded-2xl border-2 p-4 sm:p-6 shadow-sm hover:shadow-lg transition-all duration-200 ${needsAction
-                                    ? 'border-blue-200 ring-2 ring-blue-50 shadow-md'
-                                    : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                            const needsAction = canAccept || canReject || canMarkPaid || canConfirmPayment;
+
+                            return (
+                                <div key={request.id} className={`bg-white rounded-2xl border-2 p-4 sm:p-6 hover:shadow-lg transition-all duration-200 ${needsAction
+                                    ? 'border-blue-200 ring-4 ring-blue-50 shadow-md'
+                                    : 'border-gray-100 hover:border-gray-200'
                                     }`}>
 
                                     {needsAction && (
@@ -350,160 +352,136 @@ const PaymentsPage = () => {
                                                 </p>
                                             </div>
                                         </div>
-                                    )}                                {/* Responsive layout - horizontal on desktop, vertical on mobile */}
-                                    <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
-                                        {/* Left side - Main content */}
-                                        <div className="flex items-start gap-3 flex-1">
-                                            {/* Direction indicator */}
-                                            <div className={`p-2 sm:p-3 rounded-lg sm:rounded-xl flex-shrink-0 ${request.payer_id === currentUserId
-                                                ? 'bg-gradient-to-br from-green-100 to-emerald-100'
-                                                : 'bg-gradient-to-br from-red-100 to-pink-100'
-                                                }`}>
-                                                {request.payer_id === currentUserId ? (
-                                                    <ArrowDownLeft className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
-                                                ) : (
-                                                    <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
-                                                )}
-                                            </div>
+                                    )}
 
-                                            <div className="flex-1 min-w-0">
-                                                {/* Mobile: Title and Amount in same row */}
-                                                <div className="flex items-start justify-between mb-2 lg:block">
-                                                    <div className="flex-1 min-w-0">
-                                                        <h3 className="font-semibold text-gray-900 text-base sm:text-lg leading-tight">
-                                                            {request.payee_id === currentUserId
-                                                                ? `Request to ${request.payer_name}`
-                                                                : `Request from ${request.payee_name}`
-                                                            }
-                                                        </h3>
-                                                    </div>
-                                                    {/* Amount on mobile - right aligned */}
-                                                    <div className="text-right ml-4 lg:hidden">
-                                                        <div className="text-lg font-bold text-gray-900">
-                                                            {formatCurrency(request.amount, request.currency)}
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                {/* Status badge for mobile */}
-                                                <div className="mb-3 lg:hidden">
-                                                    <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border ${getStatusColor(request.status)}`}>
-                                                        {getStatusIcon(request.status)}
-                                                        {getContextualStatus(request, currentUserId)}
-                                                    </span>
-                                                </div>
-
-                                                {request.bill_title && (
-                                                    <p className="text-sm text-gray-600 mb-2 font-medium">
-                                                        📋 From: {request.bill_title}
-                                                    </p>
-                                                )}
-
-                                                {request.description && (
-                                                    <p className="text-sm text-gray-600 mb-3 leading-relaxed">
-                                                        {request.description}
-                                                    </p>
-                                                )}
-
-                                                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-xs text-gray-500">
-                                                    <span className="flex items-center gap-1">
-                                                        📅 Created: {formatDate(request.created_at)}
-                                                    </span>
-                                                    {request.due_date && (
-                                                        <span className="flex items-center gap-1">
-                                                            ⏰ Due: {formatDate(request.due_date)}
-                                                        </span>
-                                                    )}
-                                                    {request.completed_at && (
-                                                        <span className="flex items-center gap-1">
-                                                            ✅ Completed: {formatDate(request.completed_at)}
-                                                        </span>
+                                    {/* Mobile-first layout */}
+                                    <div className="flex flex-col">
+                                        {/* Header section with direction indicator, title and amount */}
+                                        <div className="flex items-start justify-between mb-4">
+                                            <div className="flex items-start gap-3 flex-1">
+                                                {/* Direction indicator */}
+                                                <div className={`p-2 sm:p-3 rounded-lg sm:rounded-xl flex-shrink-0 ${request.payer_id === currentUserId
+                                                    ? 'bg-gradient-to-br from-green-100 to-emerald-100'
+                                                    : 'bg-gradient-to-br from-red-100 to-pink-100'
+                                                    }`}>
+                                                    {request.payer_id === currentUserId ? (
+                                                        <ArrowDownLeft className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
+                                                    ) : (
+                                                        <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
                                                     )}
                                                 </div>
+
+                                                <div className="flex-1 min-w-0">
+                                                    <h3 className="font-semibold text-gray-900 text-base sm:text-lg leading-tight">
+                                                        {request.payee_id === currentUserId
+                                                            ? `Request to ${request.payer_name}`
+                                                            : `Request from ${request.payee_name}`
+                                                        }
+                                                    </h3>
+                                                </div>
                                             </div>
-                                        </div>                                    {/* Right side - Amount, status, and actions (desktop layout) */}
-                                        <div className="lg:text-right lg:ml-6 mt-4 lg:mt-0 flex-shrink-0 lg:min-w-[240px]">
-                                            {/* Amount and status for desktop only */}
-                                            <div className="hidden lg:flex lg:flex-col lg:items-end lg:gap-3 mb-4">
-                                                <div className="text-2xl font-bold text-gray-900">
+
+                                            <div className="text-right ml-3">
+                                                <div className="text-lg sm:text-2xl font-bold text-gray-900">
                                                     {formatCurrency(request.amount, request.currency)}
                                                 </div>
-                                                <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border ${getStatusColor(request.status)}`}>
-                                                    {getStatusIcon(request.status)}
-                                                    {getContextualStatus(request, currentUserId)}
+                                            </div>
+                                        </div>
+
+                                        {/* Status badge - full width on mobile */}
+                                        <div className="mb-4">
+                                            <span className={`inline-flex items-center gap-2 px-3 py-2 rounded-full text-xs font-semibold border ${getStatusColor(request.status)}`}>
+                                                {getStatusIcon(request.status)}
+                                                {getContextualStatus(request, currentUserId)}
+                                            </span>
+                                        </div>
+
+                                        {/* Content section */}
+                                        <div className="space-y-3 mb-4">
+                                            {request.bill_title && (
+                                                <p className="text-sm text-gray-600 font-medium">
+                                                    📋 From: {request.bill_title}
+                                                </p>
+                                            )}
+
+                                            {request.description && (
+                                                <p className="text-sm text-gray-600 leading-relaxed">
+                                                    {request.description}
+                                                </p>
+                                            )}
+
+                                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-xs text-gray-500">
+                                                <span className="flex items-center gap-1">
+                                                    📅 Created: {formatDate(request.created_at)}
                                                 </span>
-                                            </div>
-
-                                            {/* Action buttons */}
-                                            <div className="space-y-3">                                            {/* Accept/Decline buttons */}
-                                                {canAccept && (
-                                                    <div className="flex flex-col sm:flex-row lg:flex-col gap-2">
-                                                        <button
-                                                            onClick={() => handleQuickAction(request.id, 'accepted')}
-                                                            className="flex-1 lg:w-full px-4 py-2.5 bg-gradient-to-r from-green-600 to-green-700 text-white text-sm font-semibold rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 min-h-[44px] flex items-center justify-center"
-                                                        >
-                                                            <span className="flex items-center gap-1">
-                                                                ✅
-                                                                <span className="hidden sm:inline">Accept</span>
-                                                                <span className="sm:hidden">Accept</span>
-                                                            </span>
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleQuickAction(request.id, 'rejected')}
-                                                            className="flex-1 lg:w-full px-4 py-2.5 bg-gradient-to-r from-red-600 to-red-700 text-white text-sm font-semibold rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 min-h-[44px] flex items-center justify-center"
-                                                        >
-                                                            <span className="flex items-center gap-1">
-                                                                ❌
-                                                                <span className="hidden sm:inline">Decline</span>
-                                                                <span className="sm:hidden">Decline</span>
-                                                            </span>
-                                                        </button>
-                                                    </div>
+                                                {request.due_date && (
+                                                    <span className="flex items-center gap-1">
+                                                        ⏰ Due: {formatDate(request.due_date)}
+                                                    </span>
                                                 )}
+                                                {request.completed_at && (
+                                                    <span className="flex items-center gap-1">
+                                                        ✅ Completed: {formatDate(request.completed_at)}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
 
-                                                {/* Mark paid button */}
-                                                {canMarkPaid && (
+                                        {/* Action buttons - mobile optimized */}
+                                        <div className="space-y-3">
+                                            {/* Accept/Decline buttons - stacked on mobile */}
+                                            {canAccept && (
+                                                <div className="flex flex-col sm:flex-row gap-3">
                                                     <button
-                                                        onClick={() => handleQuickAction(request.id, 'paid_pending_confirmation')}
-                                                        className="w-full px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 min-h-[44px] flex items-center justify-center"
+                                                        onClick={() => handleQuickAction(request.id, 'accepted')}
+                                                        className="w-full px-4 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white text-sm font-semibold rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 min-h-[44px] flex items-center justify-center"
                                                     >
-                                                        💳 Mark Paid
+                                                        ✅ Accept Payment Request
                                                     </button>
-                                                )}
+                                                    <button
+                                                        onClick={() => handleQuickAction(request.id, 'rejected')}
+                                                        className="w-full px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white text-sm font-semibold rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 min-h-[44px] flex items-center justify-center"
+                                                    >
+                                                        ❌ Decline Request
+                                                    </button>
+                                                </div>
+                                            )}
 
-                                                {/* Confirm/Dispute buttons */}
-                                                {canConfirmPayment && (
-                                                    <div className="flex flex-col sm:flex-row lg:flex-col gap-2">
-                                                        <button
-                                                            onClick={() => handleQuickAction(request.id, 'completed')}
-                                                            className="flex-1 lg:w-full px-4 py-2.5 bg-gradient-to-r from-green-600 to-green-700 text-white text-sm font-semibold rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 min-h-[44px] flex items-center justify-center"
-                                                        >
-                                                            <span className="flex items-center gap-1">
-                                                                ✅
-                                                                <span className="hidden sm:inline">Confirm</span>
-                                                                <span className="sm:hidden">Confirm</span>
-                                                            </span>
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleQuickAction(request.id, 'disputed')}
-                                                            className="flex-1 lg:w-full px-4 py-2.5 bg-gradient-to-r from-orange-600 to-orange-700 text-white text-sm font-semibold rounded-lg hover:from-orange-700 hover:to-orange-800 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 min-h-[44px] flex items-center justify-center"
-                                                        >
-                                                            <span className="flex items-center gap-1">
-                                                                ⚠️
-                                                                <span className="hidden sm:inline">Dispute</span>
-                                                                <span className="sm:hidden">Dispute</span>
-                                                            </span>
-                                                        </button>
-                                                    </div>
-                                                )}                                            {/* View details link */}
-                                                <Link
-                                                    href={`/payments/${request.id}`}
-                                                    className="w-full lg:w-fit text-center lg:text-left px-4 py-2.5 lg:px-2 lg:py-1 text-sm lg:text-xs text-blue-600 hover:text-blue-700 transition-colors font-medium hover:underline border border-blue-200 rounded-lg hover:bg-blue-50 min-h-[44px] lg:min-h-[28px] flex items-center justify-center lg:justify-start lg:inline-flex"
+                                            {/* Mark paid button */}
+                                            {canMarkPaid && (
+                                                <button
+                                                    onClick={() => handleQuickAction(request.id, 'paid_pending_confirmation')}
+                                                    className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 min-h-[44px] flex items-center justify-center"
                                                 >
-                                                    <span className="lg:hidden">📝 Details</span>
-                                                    <span className="hidden lg:inline">📝 Details →</span>
-                                                </Link>
-                                            </div>
+                                                    💳 Mark as Paid
+                                                </button>
+                                            )}
+
+                                            {/* Confirm/Dispute buttons - stacked on mobile */}
+                                            {canConfirmPayment && (
+                                                <div className="flex flex-col sm:flex-row gap-3">
+                                                    <button
+                                                        onClick={() => handleQuickAction(request.id, 'completed')}
+                                                        className="w-full px-4 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white text-sm font-semibold rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 min-h-[44px] flex items-center justify-center"
+                                                    >
+                                                        ✅ Confirm Payment Received
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleQuickAction(request.id, 'disputed')}
+                                                        className="w-full px-4 py-3 bg-gradient-to-r from-orange-600 to-orange-700 text-white text-sm font-semibold rounded-lg hover:from-orange-700 hover:to-orange-800 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 min-h-[44px] flex items-center justify-center"
+                                                    >
+                                                        ⚠️ Dispute Payment
+                                                    </button>
+                                                </div>
+                                            )}
+
+                                            {/* View details link */}
+                                            <Link
+                                                href={`/payments/${request.id}`}
+                                                className="block w-full text-center px-4 py-3 text-sm text-blue-600 hover:text-blue-700 transition-colors font-medium hover:underline border border-blue-200 rounded-lg hover:bg-blue-50 min-h-[44px] flex items-center justify-center"
+                                            >
+                                                📝 View Details & History →
+                                            </Link>
                                         </div>
                                     </div>
                                 </div>

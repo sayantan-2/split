@@ -185,259 +185,260 @@ const PaymentRequestDetail = () => {
     const canConfirmPayment = isPayee && ['paid_pending_confirmation'].includes(paymentRequest.status);
     const canDispute = ['completed', 'paid_pending_confirmation'].includes(paymentRequest.status); // Anyone can dispute
 
-    return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Header */}
-            <div className="bg-white shadow-sm border-b">
-                <div className="max-w-4xl mx-auto px-4 py-4">
-                    <div className="flex items-center gap-4">
-                        <button
-                            onClick={() => router.back()}
-                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                        >
-                            <ArrowLeft className="w-5 h-5 text-gray-600" />
-                        </button>
-                        <div>
-                            <h1 className="text-xl font-semibold text-gray-900">Payment Request</h1>
-                            <p className="text-sm text-gray-600">#{paymentRequest.id}</p>
-                        </div>
+    return (<div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-white shadow-sm border-b">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => router.back()}
+                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+                        <ArrowLeft className="w-5 h-5 text-gray-600" />
+                    </button>
+                    <div>
+                        <h1 className="text-lg sm:text-xl font-semibold text-gray-900">Payment Request</h1>
+                        <p className="text-sm text-gray-600">#{paymentRequest.id}</p>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
-                {/* Status Card */}
-                <div className="bg-white rounded-lg border border-gray-200 p-6">
-                    <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center gap-3">
-                            {getStatusIcon(paymentRequest.status)}
-                            <div>                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(paymentRequest.status)}`}>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-6">                {/* Status Card */}
+            <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+                    <div className="flex items-center gap-3">
+                        {getStatusIcon(paymentRequest.status)}
+                        <div>
+                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(paymentRequest.status)}`}>
                                 {getContextualStatus(paymentRequest.status, isPayee)}
                             </span>
-                            </div>
                         </div>
-                        <div className="text-right">
-                            <div className="text-3xl font-bold text-gray-900">
-                                {formatCurrency(paymentRequest.amount, paymentRequest.currency)}
-                            </div>                            <div className="text-sm text-gray-600">
-                                {getStatusDescription(paymentRequest.status, isPayee)}
-                            </div>
+                    </div>
+                    <div className="text-left sm:text-right">
+                        <div className="text-2xl sm:text-3xl font-bold text-gray-900">
+                            {formatCurrency(paymentRequest.amount, paymentRequest.currency)}
                         </div>
-                    </div>                    {/* Action Buttons */}
-                    <div className="flex gap-3">
-                        {canAccept && (
-                            <button
-                                onClick={() => updatePaymentStatus('accepted')}
-                                disabled={actionLoading}
-                                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-                            >
-                                <CheckCircle className="w-4 h-4" />
-                                Accept Request
-                            </button>
-                        )}                        {canMarkPaid && (
-                            <button
-                                onClick={() => updatePaymentStatus('paid_pending_confirmation')}
-                                disabled={actionLoading}
-                                className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-                            >
-                                <DollarSign className="w-4 h-4" />
-                                Mark as Paid
-                            </button>
-                        )}
-                        {canConfirmPayment && (
-                            <button
-                                onClick={() => updatePaymentStatus('completed')}
-                                disabled={actionLoading}
-                                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-                            >
-                                <CheckCircle className="w-4 h-4" />
-                                Confirm Received
-                            </button>
-                        )}
-                        {canReject && (
-                            <button
-                                onClick={() => updatePaymentStatus('rejected')}
-                                disabled={actionLoading}
-                                className="px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-                            >
-                                <XCircle className="w-4 h-4" />
-                                Decline
-                            </button>
-                        )}
-                        {canCancel && (
-                            <button
-                                onClick={() => updatePaymentStatus('cancelled')}
-                                disabled={actionLoading}
-                                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
-                            >
-                                Cancel Request
-                            </button>
-                        )}
-                        {canDispute && (
-                            <button
-                                onClick={() => updatePaymentStatus('disputed')}
-                                disabled={actionLoading}
-                                className="px-4 py-2 border border-orange-300 text-orange-700 rounded-lg hover:bg-orange-50 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-                            >
-                                <AlertTriangle className="w-4 h-4" />
-                                Dispute Payment
-                            </button>
-                        )}
+                        <div className="text-sm text-gray-600">
+                            {getStatusDescription(paymentRequest.status, isPayee)}
+                        </div>
                     </div>
                 </div>
 
-                {/* Details Card */}
-                <div className="bg-white rounded-lg border border-gray-200 p-6">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4">Payment Details</h2>
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row gap-3">                        {canAccept && (
+                    <button
+                        onClick={() => updatePaymentStatus('accepted')}
+                        disabled={actionLoading}
+                        className="w-full sm:flex-1 bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 min-h-[44px]"
+                    >
+                        <CheckCircle className="w-4 h-4" />
+                        Accept Request
+                    </button>
+                )}
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-4">
-                            <div className="flex items-start gap-3">
-                                <User className="w-5 h-5 text-gray-400 mt-0.5" />
-                                <div>
-                                    <div className="text-sm font-medium text-gray-900">From</div>
-                                    <div className="text-gray-600">{paymentRequest.payer_name}</div>
-                                    <div className="text-sm text-gray-500">{paymentRequest.payer_email}</div>
-                                </div>
+                    {canMarkPaid && (
+                        <button
+                            onClick={() => updatePaymentStatus('paid_pending_confirmation')}
+                            disabled={actionLoading}
+                            className="w-full sm:flex-1 bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 min-h-[44px]"
+                        >
+                            <DollarSign className="w-4 h-4" />
+                            Mark as Paid
+                        </button>
+                    )}
+                    {canConfirmPayment && (
+                        <button
+                            onClick={() => updatePaymentStatus('completed')}
+                            disabled={actionLoading}
+                            className="w-full sm:flex-1 bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 min-h-[44px]"
+                        >
+                            <CheckCircle className="w-4 h-4" />
+                            Confirm Received
+                        </button>
+                    )}
+                    {canReject && (
+                        <button
+                            onClick={() => updatePaymentStatus('rejected')}
+                            disabled={actionLoading}
+                            className="w-full sm:w-auto px-4 py-3 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 min-h-[44px]"
+                        >
+                            <XCircle className="w-4 h-4" />
+                            Decline
+                        </button>
+                    )}
+                    {canCancel && (
+                        <button
+                            onClick={() => updatePaymentStatus('cancelled')}
+                            disabled={actionLoading}
+                            className="w-full sm:w-auto px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 min-h-[44px]"
+                        >
+                            Cancel Request
+                        </button>
+                    )}
+                    {canDispute && (
+                        <button
+                            onClick={() => updatePaymentStatus('disputed')}
+                            disabled={actionLoading}
+                            className="w-full sm:w-auto px-4 py-3 border border-orange-300 text-orange-700 rounded-lg hover:bg-orange-50 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 min-h-[44px]"
+                        >
+                            <AlertTriangle className="w-4 h-4" />
+                            Dispute Payment
+                        </button>
+                    )}
+                </div>
+            </div>                {/* Details Card */}
+            <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Payment Details</h2>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                        <div className="flex items-start gap-3">
+                            <User className="w-5 h-5 text-gray-400 mt-0.5" />
+                            <div>
+                                <div className="text-sm font-medium text-gray-900">From</div>
+                                <div className="text-gray-600">{paymentRequest.payer_name}</div>
+                                <div className="text-sm text-gray-500">{paymentRequest.payer_email}</div>
                             </div>
-
-                            <div className="flex items-start gap-3">
-                                <User className="w-5 h-5 text-gray-400 mt-0.5" />
-                                <div>
-                                    <div className="text-sm font-medium text-gray-900">To</div>
-                                    <div className="text-gray-600">{paymentRequest.payee_name}</div>
-                                    <div className="text-sm text-gray-500">{paymentRequest.payee_email}</div>
-                                </div>
-                            </div>
-
-                            {paymentRequest.bill_title && (
-                                <div className="flex items-start gap-3">
-                                    <Receipt className="w-5 h-5 text-gray-400 mt-0.5" />
-                                    <div>
-                                        <div className="text-sm font-medium text-gray-900">Related Bill</div>
-                                        <div className="text-gray-600">{paymentRequest.bill_title}</div>
-                                        {paymentRequest.bill_total && (
-                                            <div className="text-sm text-gray-500">
-                                                Total: {formatCurrency(paymentRequest.bill_total, paymentRequest.currency)}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
                         </div>
 
-                        <div className="space-y-4">
+                        <div className="flex items-start gap-3">
+                            <User className="w-5 h-5 text-gray-400 mt-0.5" />
+                            <div>
+                                <div className="text-sm font-medium text-gray-900">To</div>
+                                <div className="text-gray-600">{paymentRequest.payee_name}</div>
+                                <div className="text-sm text-gray-500">{paymentRequest.payee_email}</div>
+                            </div>
+                        </div>
+
+                        {paymentRequest.bill_title && (
                             <div className="flex items-start gap-3">
-                                <DollarSign className="w-5 h-5 text-gray-400 mt-0.5" />
+                                <Receipt className="w-5 h-5 text-gray-400 mt-0.5" />
                                 <div>
-                                    <div className="text-sm font-medium text-gray-900">Amount</div>
-                                    <div className="text-gray-600">
-                                        {formatCurrency(paymentRequest.amount, paymentRequest.currency)}
-                                    </div>
-                                    {paymentRequest.payment_method && (
+                                    <div className="text-sm font-medium text-gray-900">Related Bill</div>
+                                    <div className="text-gray-600">{paymentRequest.bill_title}</div>
+                                    {paymentRequest.bill_total && (
                                         <div className="text-sm text-gray-500">
-                                            Method: {paymentRequest.payment_method}
+                                            Total: {formatCurrency(paymentRequest.bill_total, paymentRequest.currency)}
                                         </div>
                                     )}
                                 </div>
                             </div>
+                        )}
+                    </div>
 
+                    <div className="space-y-4">
+                        <div className="flex items-start gap-3">
+                            <DollarSign className="w-5 h-5 text-gray-400 mt-0.5" />
+                            <div>
+                                <div className="text-sm font-medium text-gray-900">Amount</div>
+                                <div className="text-gray-600">
+                                    {formatCurrency(paymentRequest.amount, paymentRequest.currency)}
+                                </div>
+                                {paymentRequest.payment_method && (
+                                    <div className="text-sm text-gray-500">
+                                        Method: {paymentRequest.payment_method}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="flex items-start gap-3">
+                            <Calendar className="w-5 h-5 text-gray-400 mt-0.5" />
+                            <div>
+                                <div className="text-sm font-medium text-gray-900">Created</div>
+                                <div className="text-gray-600">{formatDate(paymentRequest.created_at)}</div>
+                            </div>
+                        </div>
+
+                        {paymentRequest.due_date && (
                             <div className="flex items-start gap-3">
                                 <Calendar className="w-5 h-5 text-gray-400 mt-0.5" />
                                 <div>
-                                    <div className="text-sm font-medium text-gray-900">Created</div>
-                                    <div className="text-gray-600">{formatDate(paymentRequest.created_at)}</div>
+                                    <div className="text-sm font-medium text-gray-900">Due Date</div>
+                                    <div className="text-gray-600">{formatDate(paymentRequest.due_date)}</div>
                                 </div>
                             </div>
+                        )}
 
-                            {paymentRequest.due_date && (
-                                <div className="flex items-start gap-3">
-                                    <Calendar className="w-5 h-5 text-gray-400 mt-0.5" />
-                                    <div>
-                                        <div className="text-sm font-medium text-gray-900">Due Date</div>
-                                        <div className="text-gray-600">{formatDate(paymentRequest.due_date)}</div>
-                                    </div>
+                        {paymentRequest.completed_at && (
+                            <div className="flex items-start gap-3">
+                                <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                                <div>
+                                    <div className="text-sm font-medium text-gray-900">Completed</div>
+                                    <div className="text-gray-600">{formatDate(paymentRequest.completed_at)}</div>
                                 </div>
-                            )}
-
-                            {paymentRequest.completed_at && (
-                                <div className="flex items-start gap-3">
-                                    <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
-                                    <div>
-                                        <div className="text-sm font-medium text-gray-900">Completed</div>
-                                        <div className="text-gray-600">{formatDate(paymentRequest.completed_at)}</div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                            </div>
+                        )}
                     </div>
-
-                    {paymentRequest.description && (
-                        <div className="mt-6 pt-6 border-t border-gray-200">
-                            <div className="flex items-start gap-3">
-                                <MessageSquare className="w-5 h-5 text-gray-400 mt-0.5" />
-                                <div>
-                                    <div className="text-sm font-medium text-gray-900 mb-2">Description</div>
-                                    <div className="text-gray-600">{paymentRequest.description}</div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {paymentRequest.notes && (
-                        <div className="mt-4 pt-4 border-t border-gray-200">
-                            <div className="flex items-start gap-3">
-                                <Edit className="w-5 h-5 text-gray-400 mt-0.5" />
-                                <div>
-                                    <div className="text-sm font-medium text-gray-900 mb-2">Notes</div>
-                                    <div className="text-gray-600">{paymentRequest.notes}</div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
                 </div>
 
-                {/* Settlements (if any) */}
-                {settlements.length > 0 && (
-                    <div className="bg-white rounded-lg border border-gray-200 p-6">
-                        <h2 className="text-lg font-semibold text-gray-900 mb-4">Settlement History</h2>
-                        <div className="space-y-4">
-                            {settlements.map((settlement) => (
-                                <div key={settlement.id} className="border border-gray-200 rounded-lg p-4">
-                                    <div className="flex justify-between items-start">
-                                        <div>
-                                            <div className="font-medium text-gray-900">
-                                                {formatCurrency(settlement.amount, settlement.currency)}
-                                            </div>
-                                            <div className="text-sm text-gray-600">
-                                                via {settlement.settlement_method}
-                                            </div>
-                                            <div className="text-xs text-gray-500">
-                                                {formatDate(settlement.created_at)}
-                                            </div>
-                                        </div>
-                                        <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(settlement.status)}`}>
-                                            {settlement.status}
-                                        </span>
-                                    </div>
-                                </div>
-                            ))}
+                {paymentRequest.description && (
+                    <div className="mt-6 pt-6 border-t border-gray-200">
+                        <div className="flex items-start gap-3">
+                            <MessageSquare className="w-5 h-5 text-gray-400 mt-0.5" />
+                            <div>
+                                <div className="text-sm font-medium text-gray-900 mb-2">Description</div>
+                                <div className="text-gray-600">{paymentRequest.description}</div>
+                            </div>
                         </div>
                     </div>
                 )}
 
-                {/* Back to Payments */}
-                <div className="text-center">
-                    <Link
-                        href="/payments"
-                        className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
-                    >
-                        <ArrowLeft className="w-4 h-4" />
-                        Back to Payments
-                    </Link>
+                {paymentRequest.notes && (
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                        <div className="flex items-start gap-3">
+                            <Edit className="w-5 h-5 text-gray-400 mt-0.5" />
+                            <div>
+                                <div className="text-sm font-medium text-gray-900 mb-2">Notes</div>
+                                <div className="text-gray-600">{paymentRequest.notes}</div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Settlements (if any) */}
+            {settlements.length > 0 && (
+                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                    <h2 className="text-lg font-semibold text-gray-900 mb-4">Settlement History</h2>
+                    <div className="space-y-4">
+                        {settlements.map((settlement) => (
+                            <div key={settlement.id} className="border border-gray-200 rounded-lg p-4">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <div className="font-medium text-gray-900">
+                                            {formatCurrency(settlement.amount, settlement.currency)}
+                                        </div>
+                                        <div className="text-sm text-gray-600">
+                                            via {settlement.settlement_method}
+                                        </div>
+                                        <div className="text-xs text-gray-500">
+                                            {formatDate(settlement.created_at)}
+                                        </div>
+                                    </div>
+                                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(settlement.status)}`}>
+                                        {settlement.status}
+                                    </span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
+            )}
+
+            {/* Back to Payments */}
+            <div className="text-center">
+                <Link
+                    href="/payments"
+                    className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
+                >
+                    <ArrowLeft className="w-4 h-4" />
+                    Back to Payments
+                </Link>
             </div>
         </div>
+    </div>
     );
 };
 
