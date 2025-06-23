@@ -11,7 +11,7 @@ This guide covers different approaches for setting up your development and produ
 docker-compose -f docker-compose.dev.yml up -d
 
 # 2. Set up environment variables
-cp .env.example .env.local
+cp .env.example .env
 
 # 3. Install dependencies
 bun install
@@ -44,7 +44,7 @@ This approach runs the database in Docker but your Next.js app locally for faste
 
 2. **Set up environment variables:**
    ```bash
-   cp .env.example .env.local
+   cp .env.example .env
    ```
 
 3. **Install dependencies:**
@@ -143,7 +143,7 @@ Install PostgreSQL locally and run everything on your machine.
    CREATE USER postgres WITH PASSWORD 'password';
    GRANT ALL PRIVILEGES ON DATABASE splitwise_db TO postgres;
    ```
-3. **Update .env.local:**
+3. **Update .env:**
    ```
    DATABASE_URL=postgresql://postgres:password@localhost:5432/splitwise_db
    ```
