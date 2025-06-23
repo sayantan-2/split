@@ -107,6 +107,22 @@ export const settlements = pgTable("settlements", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Invitations table (tracks pending group invitations)
+export const invitations = pgTable("invitations", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  groupId: uuid("group_id")
+    .references(() => groups.id)
+    .notNull(),
+  invitedBy: uuid("invited_by")
+    .references(() => users.id)
+    .notNull(),
+  email: text("email").notNull(),
+  token: text("token").unique().notNull(),
+  accepted: boolean("accepted").default(false).notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // NextAuth tables
 export const accounts = pgTable("accounts", {
   userId: uuid("user_id")
@@ -155,9 +171,9 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   groupMembers: many(groupMembers),
   createdGroups: many(groups),
   expenses: many(expenses),
-  expenseSplits: many(expenseSplits),
-  paymentsReceived: many(settlements, { relationName: "payee" }),
+  expenseSplits: many(expenseSplits),  paymentsReceived: many(settlements, { relationName: "payee" }),
   paymentsMade: many(settlements, { relationName: "payer" }),
+  sentInvitations: many(invitations),
   accounts: many(accounts),
   sessions: many(sessions),
   password: one(passwords),
@@ -167,10 +183,10 @@ export const groupsRelations = relations(groups, ({ one, many }) => ({
   creator: one(users, {
     fields: [groups.createdBy],
     references: [users.id],
-  }),
-  members: many(groupMembers),
+  }),  members: many(groupMembers),
   expenses: many(expenses),
   settlements: many(settlements),
+  invitations: many(invitations),
 }));
 
 export const groupMembersRelations = relations(groupMembers, ({ one }) => ({
@@ -224,6 +240,17 @@ export const settlementsRelations = relations(settlements, ({ one }) => ({
   }),
 }));
 
+export const invitationsRelations = relations(invitations, ({ one }) => ({
+  group: one(groups, {
+    fields: [invitations.groupId],
+    references: [groups.id],
+  }),
+  inviter: one(users, {
+    fields: [invitations.invitedBy],
+    references: [users.id],
+  }),
+}));
+
 export const accountsRelations = relations(accounts, ({ one }) => ({
   user: one(users, {
     fields: [accounts.userId],
@@ -263,6 +290,9 @@ export type NewExpenseSplit = typeof expenseSplits.$inferInsert;
 
 export type Settlement = typeof settlements.$inferSelect;
 export type NewSettlement = typeof settlements.$inferInsert;
+
+export type Invitation = typeof invitations.$inferSelect;
+export type NewInvitation = typeof invitations.$inferInsert;
 
 export type Account = typeof accounts.$inferSelect;
 export type NewAccount = typeof accounts.$inferInsert;
