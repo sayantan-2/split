@@ -21,6 +21,9 @@ bun run db:push
 
 # 5. Start development server
 bun run dev
+
+# 6. In a second terminal, start Drizzle Studio
+bun run db:studio
 ```
 
 Your app will be available at `http://localhost:3000`
@@ -44,7 +47,8 @@ This approach runs the database in Docker but your Next.js app locally for faste
 
 2. **Set up environment variables:**
    ```bash
-   cp .env.example .env
+   cp .env.example .env.local
+   # OR rename .env.local to .env for Drizzle Studio compatibility
    ```
 
 3. **Install dependencies:**
@@ -62,6 +66,12 @@ This approach runs the database in Docker but your Next.js app locally for faste
    bun run dev
    ```
 
+6. **Open Drizzle Studio (in a second terminal):**
+   ```bash
+   bun run db:studio
+   ```
+   Access at `http://localhost:4983` for database management
+
 #### How Database Connection Works:
 - Database runs in Docker container on port 5432
 - Docker maps container port to `localhost:5432` on your machine
@@ -70,9 +80,12 @@ This approach runs the database in Docker but your Next.js app locally for faste
 
 #### Daily Development Workflow:
 ```bash
-# Start your day
+# Terminal 1: Start your day
 docker-compose -f docker-compose.dev.yml up -d
 bun run dev
+
+# Terminal 2: Start Drizzle Studio (optional, for database management)
+bun run db:studio
 
 # Make code changes - they're reflected immediately with hot reload
 # No need to rebuild Docker containers!
@@ -80,6 +93,10 @@ bun run dev
 # End of day
 docker-compose -f docker-compose.dev.yml down
 ```
+
+#### Database Management:
+- **Drizzle Studio**: Access at `http://localhost:4983` for visual database management
+- **Direct SQL**: Use the commands in the Useful Commands section below
 
 #### Benefits:
 - ✅ **Fast hot reload and development**
@@ -147,6 +164,7 @@ Install PostgreSQL locally and run everything on your machine.
    ```
    DATABASE_URL=postgresql://postgres:password@localhost:5432/splitwise_db
    ```
+   **Note**: Use `.env` (not `.env.local`) for Drizzle Studio compatibility
 4. **Install dependencies and run:**
    ```bash
    bun install
@@ -280,8 +298,12 @@ docker-compose logs db
 **Commands Summary:**
 ```bash
 # Development (daily workflow)
+# Terminal 1:
 docker-compose -f docker-compose.dev.yml up -d
 bun run dev
+
+# Terminal 2 (optional, for database management):
+bun run db:studio
 
 # Production build testing
 docker-compose up --build
