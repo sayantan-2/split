@@ -107,14 +107,60 @@ export const settlements = pgTable("settlements", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// NextAuth tables
+export const accounts = pgTable("accounts", {
+  userId: uuid("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+  type: text("type").notNull(),
+  provider: text("provider").notNull(),
+  providerAccountId: text("provider_account_id").notNull(),
+  refresh_token: text("refresh_token"),
+  access_token: text("access_token"),
+  expires_at: timestamp("expires_at"),
+  token_type: text("token_type"),
+  scope: text("scope"),
+  id_token: text("id_token"),
+  session_state: text("session_state"),
+});
+
+export const sessions = pgTable("sessions", {
+  sessionToken: text("session_token").primaryKey(),
+  userId: uuid("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+  expires: timestamp("expires").notNull(),
+});
+
+export const verificationTokens = pgTable("verification_tokens", {
+  identifier: text("identifier").notNull(),
+  token: text("token").notNull(),
+  expires: timestamp("expires").notNull(),
+});
+
+// Passwords table for credential authentication
+export const passwords = pgTable("passwords", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .unique()
+    .notNull(),
+  hashedPassword: text("hashed_password").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Define relationships
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ many, one }) => ({
   groupMembers: many(groupMembers),
   createdGroups: many(groups),
-  paidExpenses: many(expenses),
+  expenses: many(expenses),
   expenseSplits: many(expenseSplits),
-  settlementsAsPayer: many(settlements, { relationName: "payer" }),
-  settlementsAsPayee: many(settlements, { relationName: "payee" }),
+  paymentsReceived: many(settlements, { relationName: "payee" }),
+  paymentsMade: many(settlements, { relationName: "payer" }),
+  accounts: many(accounts),
+  sessions: many(sessions),
+  password: one(passwords),
 }));
 
 export const groupsRelations = relations(groups, ({ one, many }) => ({
@@ -178,6 +224,27 @@ export const settlementsRelations = relations(settlements, ({ one }) => ({
   }),
 }));
 
+export const accountsRelations = relations(accounts, ({ one }) => ({
+  user: one(users, {
+    fields: [accounts.userId],
+    references: [users.id],
+  }),
+}));
+
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+  user: one(users, {
+    fields: [sessions.userId],
+    references: [users.id],
+  }),
+}));
+
+export const passwordsRelations = relations(passwords, ({ one }) => ({
+  user: one(users, {
+    fields: [passwords.userId],
+    references: [users.id],
+  }),
+}));
+
 // Export types for TypeScript
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -196,3 +263,15 @@ export type NewExpenseSplit = typeof expenseSplits.$inferInsert;
 
 export type Settlement = typeof settlements.$inferSelect;
 export type NewSettlement = typeof settlements.$inferInsert;
+
+export type Account = typeof accounts.$inferSelect;
+export type NewAccount = typeof accounts.$inferInsert;
+
+export type Session = typeof sessions.$inferSelect;
+export type NewSession = typeof sessions.$inferInsert;
+
+export type VerificationToken = typeof verificationTokens.$inferSelect;
+export type NewVerificationToken = typeof verificationTokens.$inferInsert;
+
+export type Password = typeof passwords.$inferSelect;
+export type NewPassword = typeof passwords.$inferInsert;
