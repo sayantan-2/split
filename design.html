@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Splitwise Clone - System Design</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .diagram-container {
+            padding: 40px;
+            background: #f8fafc;
+        }
+
+        .architecture-diagram {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .layer {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 2px solid #e2e8f0;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .layer:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .layer-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #2d3748;
+            border-bottom: 3px solid #4299e1;
+            padding-bottom: 10px;
+        }
+
+        .component {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            font-weight: 600;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .component:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(66, 153, 225, 0.4);
+        }
+
+        .component.frontend {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+
+        .component.backend {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+        }
+
+        .component.database {
+            background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+        }
+
+        .component.external {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+        }
+
+        .data-flow {
+            margin: 50px 0;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .flow-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .flow-step {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            font-weight: 600;
+            min-width: 150px;
+            position: relative;
+            flex: 1;
+            max-width: 200px;
+        }
+
+        .flow-arrow {
+            font-size: 2rem;
+            color: #4299e1;
+            font-weight: bold;
+        }
+
+        .database-schema {
+            margin: 50px 0;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .schema-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .tables-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .table {
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #f8fafc;
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+            color: white;
+            padding: 15px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .table-field {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+            background: white;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+        }
+
+        .table-field:last-child {
+            border-bottom: none;
+        }
+
+        .primary-key {
+            background: #fed7d7;
+            color: #c53030;
+            font-weight: 600;
+        }
+
+        .foreign-key {
+            background: #bee3f8;
+            color: #2b6cb0;
+            font-weight: 600;
+        }
+
+        .api-endpoints {
+            margin: 50px 0;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .api-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .endpoint-group {
+            margin: 20px 0;
+        }
+
+        .endpoint-group-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .endpoint {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            margin: 8px 0;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #4299e1;
+        }
+
+        .method {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            margin-right: 15px;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .method.get {
+            background: #48bb78;
+            color: white;
+        }
+
+        .method.post {
+            background: #4299e1;
+            color: white;
+        }
+
+        .method.put {
+            background: #ed8936;
+            color: white;
+        }
+
+        .method.delete {
+            background: #f56565;
+            color: white;
+        }
+
+        .endpoint-path {
+            font-family: 'Monaco', 'Consolas', monospace;
+            color: #2d3748;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .architecture-diagram {
+                grid-template-columns: 1fr;
+            }
+
+            .flow-diagram {
+                flex-direction: column;
+            }
+
+            .flow-arrow {
+                transform: rotate(90deg);
+            }
+
+            .tables-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏛️ Splitwise Clone System Design</h1>
+            <p>Comprehensive Architecture Overview</p>
+        </div>
+
+        <div class="diagram-container">
+            <!-- Architecture Layers -->
+            <div class="architecture-diagram">
+                <div class="layer">
+                    <div class="layer-title">🖥️ Frontend Layer</div>
+                    <div class="component frontend">Next.js 14 App Router</div>
+                    <div class="component frontend">React Components</div>
+                    <div class="component frontend">Tailwind CSS</div>
+                    <div class="component frontend">TypeScript</div>
+                    <div class="component frontend">NextAuth.js Client</div>
+                    <div class="component frontend">React Hook Form</div>
+                    <div class="component frontend">Zustand (State Mgmt)</div>
+                </div>
+
+                <div class="layer">
+                    <div class="layer-title">⚙️ Backend Layer</div>
+                    <div class="component backend">Next.js API Routes</div>
+                    <div class="component backend">NextAuth.js Server</div>
+                    <div class="component backend">Drizzle ORM</div>
+                    <div class="component backend">Zod Validation</div>
+                    <div class="component backend">JWT Tokens</div>
+                    <div class="component backend">File Upload Handler</div>
+                    <div class="component backend">Email Service</div>
+                </div>
+
+                <div class="layer">
+                    <div class="layer-title">🗄️ Data Layer</div>
+                    <div class="component database">PostgreSQL 15</div>
+                    <div class="component database">Redis Cache</div>
+                    <div class="component database">S3 File Storage</div>
+                    <div class="component external">Email Provider</div>
+                    <div class="component external">OAuth Providers</div>
+                    <div class="component external">CDN</div>
+                </div>
+            </div>
+
+            <!-- Data Flow Diagram -->
+            <div class="data-flow">
+                <div class="flow-title">📊 Data Flow Architecture</div>
+                <div class="flow-diagram">
+                    <div class="flow-step">User Interface<br/>(React Components)</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">API Routes<br/>(Next.js)</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">Business Logic<br/>(Services)</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">Database<br/>(PostgreSQL)</div>
+                </div>
+            </div>
+
+            <!-- Database Schema -->
+            <div class="database-schema">
+                <div class="schema-title">🗃️ Database Schema Design</div>
+                <div class="tables-grid">
+                    <div class="table">
+                        <div class="table-header">👤 users</div>
+                        <div class="table-field primary-key">id: UUID (PK)</div>
+                        <div class="table-field">email: VARCHAR(255) UNIQUE</div>
+                        <div class="table-field">name: VARCHAR(100)</div>
+                        <div class="table-field">avatar: TEXT</div>
+                        <div class="table-field">email_verified: TIMESTAMP</div>
+                        <div class="table-field">created_at: TIMESTAMP</div>
+                        <div class="table-field">updated_at: TIMESTAMP</div>
+                    </div>
+
+                    <div class="table">
+                        <div class="table-header">👥 groups</div>
+                        <div class="table-field primary-key">id: UUID (PK)</div>
+                        <div class="table-field">name: VARCHAR(100)</div>
+                        <div class="table-field">description: TEXT</div>
+                        <div class="table-field">avatar: TEXT</div>
+                        <div class="table-field foreign-key">created_by: UUID (FK)</div>
+                        <div class="table-field">created_at: TIMESTAMP</div>
+                        <div class="table-field">updated_at: TIMESTAMP</div>
+                    </div>
+
+                    <div class="table">
+                        <div class="table-header">🔗 group_members</div>
+                        <div class="table-field primary-key">id: UUID (PK)</div>
+                        <div class="table-field foreign-key">group_id: UUID (FK)</div>
+                        <div class="table-field foreign-key">user_id: UUID (FK)</div>
+                        <div class="table-field">role: ENUM</div>
+                        <div class="table-field">status: ENUM</div>
+                        <div class="table-field">joined_at: TIMESTAMP</div>
+                    </div>
+
+                    <div class="table">
+                        <div class="table-header">💰 expenses</div>
+                        <div class="table-field primary-key">id: UUID (PK)</div>
+                        <div class="table-field foreign-key">group_id: UUID (FK)</div>
+                        <div class="table-field">amount: DECIMAL(10,2)</div>
+                        <div class="table-field">description: VARCHAR(255)</div>
+                        <div class="table-field">category: VARCHAR(50)</div>
+                        <div class="table-field foreign-key">paid_by: UUID (FK)</div>
+                        <div class="table-field">receipt_url: TEXT</div>
+                        <div class="table-field">expense_date: DATE</div>
+                        <div class="table-field">created_at: TIMESTAMP</div>
+                    </div>
+
+                    <div class="table">
+                        <div class="table-header">📊 expense_splits</div>
+                        <div class="table-field primary-key">id: UUID (PK)</div>
+                        <div class="table-field foreign-key">expense_id: UUID (FK)</div>
+                        <div class="table-field foreign-key">user_id: UUID (FK)</div>
+                        <div class="table-field">amount: DECIMAL(10,2)</div>
+                        <div class="table-field">percentage: DECIMAL(5,2)</div>
+                        <div class="table-field">split_type: ENUM</div>
+                    </div>
+
+                    <div class="table">
+                        <div class="table-header">💸 settlements</div>
+                        <div class="table-field primary-key">id: UUID (PK)</div>
+                        <div class="table-field foreign-key">group_id: UUID (FK)</div>
+                        <div class="table-field foreign-key">from_user: UUID (FK)</div>
+                        <div class="table-field foreign-key">to_user: UUID (FK)</div>
+                        <div class="table-field">amount: DECIMAL(10,2)</div>
+                        <div class="table-field">status: ENUM</div>
+                        <div class="table-field">notes: TEXT</div>
+                        <div class="table-field">created_at: TIMESTAMP</div>
+                        <div class="table-field">settled_at: TIMESTAMP</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Endpoints -->
+            <div class="api-endpoints">
+                <div class="api-title">🔌 API Endpoints Structure</div>
+
+                <div class="endpoint-group">
+                    <div class="endpoint-group-title">Authentication</div>
+                    <div class="endpoint">
+                        <span class="method post">POST</span>
+                        <span class="endpoint-path">/api/auth/register</span>
+                    </div>
+                    <div class="endpoint">
+                        <span class="method post">POST</span>
+                        <span class="endpoint-path">/api/auth/login</span>
+                    </div>
+                    <div class="endpoint">
+                        <span class="method post">POST</span>
+                        <span class="endpoint-path">/api/auth/logout</span>
+                    </div>
+                    <div class="endpoint">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-path">/api/auth/me</span>
+                    </div>
+                </div>
+
+                <div class="endpoint-group">
+                    <div class="endpoint-group-title">Groups Management</div>
+                    <div class="endpoint">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-path">/api/groups</span>
+                    </div>
+                    <div class="endpoint">
+                        <span class="method post">POST</span>
+                        <span class="endpoint-path">/api/groups</span>
+                    </div>
+                    <div class="endpoint">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-path">/api/groups/[id]</span>
+                    </div>
+                    <div class="endpoint">
+                        <span class="method put">PUT</span>
+                        <span class="endpoint-path">/api/groups/[id]</span>
+                    </div>
+                    <div class="endpoint">
+                        <span class="method post">POST</span>
+                        <span class="endpoint-path">/api/groups/[id]/invite</span>
+                    </div>
+                    <div class="endpoint">
+                        <span class="method post">POST</span>
+                        <span class="endpoint-path">/api/groups/[id]/join</span>
+                    </div>
+                </div>
+
+                <div class="endpoint-group">
+                    <div class="endpoint-group-title">Expenses Management</div>
+                    <div class="endpoint">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-path">/api/groups/[id]/expenses</span>
+                    </div>
+                    <div class="endpoint">
+                        <span class="method post">POST</span>
+                        <span class="endpoint-path">/api/groups/[id]/expenses</span>
+                    </div>
+                    <div class="endpoint">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-path">/api/expenses/[id]</span>
+                    </div>
+                    <div class="endpoint">
+                        <span class="method put">PUT</span>
+                        <span class="endpoint-path">/api/expenses/[id]</span>
+                    </div>
+                    <div class="endpoint">
+                        <span class="method delete">DELETE</span>
+                        <span class="endpoint-path">/api/expenses/[id]</span>
+                    </div>
+                </div>
+
+                <div class="endpoint-group">
+                    <div class="endpoint-group-title">Balances & Settlements</div>
+                    <div class="endpoint">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-path">/api/groups/[id]/balances</span>
+                    </div>
+                    <div class="endpoint">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-path">/api/groups/[id]/settlements</span>
+                    </div>
+                    <div class="endpoint">
+                        <span class="method post">POST</span>
+                        <span class="endpoint-path">/api/settlements</span>
+                    </div>
+                    <div class="endpoint">
+                        <span class="method put">PUT</span>
+                        <span class="endpoint-path">/api/settlements/[id]</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
