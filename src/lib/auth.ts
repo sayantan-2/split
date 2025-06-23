@@ -1,21 +1,20 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { DrizzleAdapter } from "@auth/drizzle-adapter";
-import { db } from "@/db";
-import { users, passwords } from "@/db/schema";
+import { db } from "../db";
+import { users, passwords } from "../db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
-  // Use Drizzle adapter for NextAuth
-  adapter: DrizzleAdapter(db),
-  
+  // For credentials provider, we don't need the adapter
+  // adapter: DrizzleAdapter(db),
+
   providers: [
     CredentialsProvider({
       name: "credentials",
       credentials: {
         email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
@@ -66,8 +65,8 @@ export const authOptions: NextAuthOptions = {
           console.error("Error during authentication:", error);
           return null;
         }
-      }
-    })
+      },
+    }),
   ],
 
   session: {

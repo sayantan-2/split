@@ -1,5 +1,5 @@
-import { db } from "@/db";
-import { users, passwords } from "@/db/schema";
+import { db } from "../db";
+import { users, passwords } from "../db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
@@ -53,11 +53,7 @@ export async function createUser({ email, name, password }: CreateUserData) {
 
 export async function getUserById(id: string) {
   try {
-    const user = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, id))
-      .limit(1);
+    const user = await db.select().from(users).where(eq(users.id, id)).limit(1);
 
     return user[0] || null;
   } catch (error) {
