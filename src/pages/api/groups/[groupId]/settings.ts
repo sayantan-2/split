@@ -1,8 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../../lib/auth";
-import { db } from "../../../db";
-import { groups, groupMembers } from "../../../db/schema";
+import { authOptions } from "@/lib/auth";
+import { db } from "@/db";
+import {
+  groups,
+  groupMembers,
+  expenses,
+  expenseSplits,
+  settlements,
+  invitations,
+} from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 
 export default async function handler(
@@ -33,7 +40,9 @@ export default async function handler(
     .limit(1);
 
   if (membership.length === 0) {
-    return res.status(403).json({ error: "Only group admins can modify group settings" });
+    return res
+      .status(403)
+      .json({ error: "Only group admins can modify group settings" });
   }
 
   if (req.method === "PUT") {
@@ -61,14 +70,38 @@ export default async function handler(
       return res.status(500).json({ error: "Failed to update group" });
     }
   }
-
   if (req.method === "DELETE") {
-    // Delete group
+    // Delete group and all related data
     try {
-      // First delete all group members
+      // We need to delete in the correct order due to foreign key constraints
+
+      // 1. Delete expense splits first (they reference expenses)
+      const groupExpenses = await db
+        .select({ id: expenses.id })
+        .from(expenses)
+        .where(eq(expenses.groupId, groupId));
+      if (groupExpenses.length > 0) {
+        const expenseIds = groupExpenses.map((e: { id: string }) => e.id);
+        for (const expenseId of expenseIds) {
+          await db
+            .delete(expenseSplits)
+            .where(eq(expenseSplits.expenseId, expenseId));
+        }
+      }
+
+      // 2. Delete expenses
+      await db.delete(expenses).where(eq(expenses.groupId, groupId));
+
+      // 3. Delete settlements
+      await db.delete(settlements).where(eq(settlements.groupId, groupId));
+
+      // 4. Delete invitations
+      await db.delete(invitations).where(eq(invitations.groupId, groupId));
+
+      // 5. Delete group members
       await db.delete(groupMembers).where(eq(groupMembers.groupId, groupId));
-      
-      // Then delete the group
+
+      // 6. Finally delete the group
       await db.delete(groups).where(eq(groups.id, groupId));
 
       return res.status(200).json({ message: "Group deleted successfully" });

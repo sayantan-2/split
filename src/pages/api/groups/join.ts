@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../../lib/auth";
-import { db } from "../../../db";
-import { invitations, groups, groupMembers, users } from "../../../db/schema";
+import { authOptions } from "@/lib/auth";
+import { db } from "@/db";
+import { invitations, groups, groupMembers, users } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 
 export default async function handler(
@@ -54,7 +54,9 @@ export default async function handler(
 
     // Check if invitation has already been accepted
     if (invite.accepted) {
-      return res.status(409).json({ error: "Invitation has already been accepted" });
+      return res
+        .status(409)
+        .json({ error: "Invitation has already been accepted" });
     }
 
     // Get current user's email
@@ -70,8 +72,8 @@ export default async function handler(
 
     // Check if invitation email matches current user's email
     if (invite.email !== currentUser[0].email) {
-      return res.status(403).json({ 
-        error: "This invitation was sent to a different email address" 
+      return res.status(403).json({
+        error: "This invitation was sent to a different email address",
       });
     }
 
@@ -88,7 +90,9 @@ export default async function handler(
       .limit(1);
 
     if (existingMember.length > 0) {
-      return res.status(409).json({ error: "You are already a member of this group" });
+      return res
+        .status(409)
+        .json({ error: "You are already a member of this group" });
     }
 
     // Add user to group
@@ -116,7 +120,6 @@ export default async function handler(
       },
       member: newMember[0],
     });
-
   } catch (error) {
     console.error("Error joining group:", error);
     return res.status(500).json({ error: "Failed to join group" });

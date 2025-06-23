@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../../../../lib/auth";
-import { db } from "../../../../../db";
-import { expenses, expenseSplits, groupMembers, users } from "../../../../../db/schema";
+import { authOptions } from "@/lib/auth";
+import { db } from "@/db";
+import { expenses, expenseSplits, groupMembers, users } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 
 export default async function handler(
@@ -42,12 +42,7 @@ export default async function handler(
   const expense = await db
     .select()
     .from(expenses)
-    .where(
-      and(
-        eq(expenses.id, expenseId),
-        eq(expenses.groupId, groupId)
-      )
-    )
+    .where(and(eq(expenses.id, expenseId), eq(expenses.groupId, groupId)))
     .limit(1);
 
   if (expense.length === 0) {
@@ -104,18 +99,13 @@ export default async function handler(
     // Update expense (only by the person who paid)
     try {
       if (expense[0].paidById !== session.user.id) {
-        return res.status(403).json({ error: "Only the person who paid can edit this expense" });
+        return res
+          .status(403)
+          .json({ error: "Only the person who paid can edit this expense" });
       }
 
-      const {
-        title,
-        description,
-        amount,
-        currency,
-        category,
-        date,
-        splits
-      } = req.body;
+      const { title, description, amount, currency, category, date, splits } =
+        req.body;
 
       if (!title?.trim()) {
         return res.status(400).json({ error: "Title is required" });
@@ -143,10 +133,12 @@ export default async function handler(
       // If splits are provided, update them
       if (splits && Array.isArray(splits)) {
         // Delete existing splits
-        await db.delete(expenseSplits).where(eq(expenseSplits.expenseId, expenseId));
+        await db
+          .delete(expenseSplits)
+          .where(eq(expenseSplits.expenseId, expenseId));
 
         // Create new splits
-        const expenseSplitData = splits.map(split => ({
+        const expenseSplitData = splits.map((split) => ({
           expenseId,
           userId: split.userId,
           amount: split.amount.toString(),
@@ -170,11 +162,15 @@ export default async function handler(
     // Delete expense (only by the person who paid)
     try {
       if (expense[0].paidById !== session.user.id) {
-        return res.status(403).json({ error: "Only the person who paid can delete this expense" });
+        return res
+          .status(403)
+          .json({ error: "Only the person who paid can delete this expense" });
       }
 
       // Delete expense splits first
-      await db.delete(expenseSplits).where(eq(expenseSplits.expenseId, expenseId));
+      await db
+        .delete(expenseSplits)
+        .where(eq(expenseSplits.expenseId, expenseId));
 
       // Delete expense
       await db.delete(expenses).where(eq(expenses.id, expenseId));

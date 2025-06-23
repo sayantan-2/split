@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../../../lib/auth";
-import { db } from "../../../../db";
-import { expenses, expenseSplits, groupMembers, users } from "../../../../db/schema";
+import { authOptions } from "@/lib/auth";
+import { db } from "@/db";
+import { expenses, expenseSplits, groupMembers, users } from "@/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 
 export default async function handler(
@@ -99,7 +99,7 @@ export default async function handler(
         category,
         splitType = "equal",
         date,
-        splits
+        splits,
       } = req.body;
 
       if (!title?.trim()) {
@@ -115,25 +115,34 @@ export default async function handler(
       }
 
       // Validate that all split users are group members
-      const splitUserIds = splits.map(split => split.userId);
+      const splitUserIds = splits.map((split) => split.userId);
       const groupMemberships = await db
         .select({ userId: groupMembers.userId })
         .from(groupMembers)
         .where(eq(groupMembers.groupId, groupId));
 
-      const validMemberIds = groupMemberships.map(m => m.userId);
-      const invalidUserIds = splitUserIds.filter(id => !validMemberIds.includes(id));
-      
+      const validMemberIds = groupMemberships.map((m) => m.userId);
+      const invalidUserIds = splitUserIds.filter(
+        (id) => !validMemberIds.includes(id)
+      );
+
       if (invalidUserIds.length > 0) {
-        return res.status(400).json({ error: "Some users are not members of this group" });
+        return res
+          .status(400)
+          .json({ error: "Some users are not members of this group" });
       }
 
       // Validate split amounts
-      const totalSplitAmount = splits.reduce((sum, split) => sum + parseFloat(split.amount), 0);
+      const totalSplitAmount = splits.reduce(
+        (sum, split) => sum + parseFloat(split.amount),
+        0
+      );
       const expenseAmount = parseFloat(amount);
-      
+
       if (Math.abs(totalSplitAmount - expenseAmount) > 0.01) {
-        return res.status(400).json({ error: "Split amounts must equal the total expense amount" });
+        return res
+          .status(400)
+          .json({ error: "Split amounts must equal the total expense amount" });
       }
 
       // Create expense
@@ -153,7 +162,7 @@ export default async function handler(
         .returning();
 
       // Create expense splits
-      const expenseSplitData = splits.map(split => ({
+      const expenseSplitData = splits.map((split) => ({
         expenseId: newExpense[0].id,
         userId: split.userId,
         amount: split.amount.toString(),

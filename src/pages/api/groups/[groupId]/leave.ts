@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../../../lib/auth";
-import { db } from "../../../../db";
-import { groupMembers } from "../../../../db/schema";
+import { authOptions } from "@/lib/auth";
+import { db } from "@/db";
+import { groupMembers } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 
 export default async function handler(
@@ -39,7 +39,9 @@ export default async function handler(
       .limit(1);
 
     if (membership.length === 0) {
-      return res.status(404).json({ error: "You are not a member of this group" });
+      return res
+        .status(404)
+        .json({ error: "You are not a member of this group" });
     }
 
     // Check if user is the only admin
@@ -47,15 +49,13 @@ export default async function handler(
       .select()
       .from(groupMembers)
       .where(
-        and(
-          eq(groupMembers.groupId, groupId),
-          eq(groupMembers.role, "admin")
-        )
+        and(eq(groupMembers.groupId, groupId), eq(groupMembers.role, "admin"))
       );
 
     if (membership[0].role === "admin" && adminCount.length === 1) {
-      return res.status(400).json({ 
-        error: "Cannot leave group as the only admin. Please assign another admin first or delete the group." 
+      return res.status(400).json({
+        error:
+          "Cannot leave group as the only admin. Please assign another admin first or delete the group.",
       });
     }
 
@@ -74,10 +74,9 @@ export default async function handler(
       return res.status(404).json({ error: "Failed to leave group" });
     }
 
-    return res.status(200).json({ 
-      message: "Successfully left the group" 
+    return res.status(200).json({
+      message: "Successfully left the group",
     });
-
   } catch (error) {
     console.error("Error leaving group:", error);
     return res.status(500).json({ error: "Internal server error" });

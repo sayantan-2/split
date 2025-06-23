@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../../../lib/auth";
-import { db } from "../../../../db";
-import { groupMembers, users } from "../../../../db/schema";
+import { authOptions } from "@/lib/auth";
+import { db } from "@/db";
+import { groupMembers, users } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { z } from "zod";
 

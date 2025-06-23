@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../../../../lib/auth";
-import { db } from "../../../../../db";
-import { groupMembers } from "../../../../../db/schema";
+import { authOptions } from "@/lib/auth";
+import { db } from "@/db";
+import { groupMembers } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 
 export default async function handler(
@@ -43,7 +43,10 @@ export default async function handler(
     }
 
     // Users can remove themselves, or admins can remove others
-    if (currentUserMembership[0].role !== "admin" && memberId !== session.user.id) {
+    if (
+      currentUserMembership[0].role !== "admin" &&
+      memberId !== session.user.id
+    ) {
       return res.status(403).json({ error: "Permission denied" });
     }
 
@@ -68,15 +71,13 @@ export default async function handler(
         .select()
         .from(groupMembers)
         .where(
-          and(
-            eq(groupMembers.groupId, groupId),
-            eq(groupMembers.role, "admin")
-          )
+          and(eq(groupMembers.groupId, groupId), eq(groupMembers.role, "admin"))
         );
 
       if (adminCount.length === 1) {
-        return res.status(400).json({ 
-          error: "Cannot remove the only admin. Please assign another admin first." 
+        return res.status(400).json({
+          error:
+            "Cannot remove the only admin. Please assign another admin first.",
         });
       }
     }
@@ -96,10 +97,9 @@ export default async function handler(
       return res.status(404).json({ error: "Failed to remove member" });
     }
 
-    return res.status(200).json({ 
-      message: "Member removed successfully" 
+    return res.status(200).json({
+      message: "Member removed successfully",
     });
-
   } catch (error) {
     console.error("Error removing member:", error);
     return res.status(500).json({ error: "Internal server error" });
