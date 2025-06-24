@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -234,7 +232,13 @@ export default function GroupsPage() {
                         </div>
                     </div>
                 </div>
-            )}
-        </div>
+            )}        </div>
     );
+}
+
+// This prevents static generation and forces server-side rendering
+export async function getServerSideProps() {
+    return {
+        props: {}, // will be passed to the page component as props
+    };
 }

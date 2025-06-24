@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
@@ -151,8 +149,14 @@ export default function SignUp() {
                             {loading ? "Creating account..." : "Create account"}
                         </button>
                     </div>
-                </form>
-            </div>
+                </form>            </div>
         </div>
     );
+}
+
+// This prevents static generation and forces server-side rendering
+export async function getServerSideProps() {
+    return {
+        props: {}, // will be passed to the page component as props
+    };
 }

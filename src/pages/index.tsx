@@ -3,15 +3,23 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 import Link from "next/link";
 
-export default function Home() {
-  const { data: session, status } = useSession();
+const RedirectToDashboard = () => {
   const router = useRouter();
-
   useEffect(() => {
-    if (status === "authenticated") {
-      router.push("/dashboard");
-    }
-  }, [status, router]);
+    router.push("/dashboard");
+  }, [router]);
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Redirecting to dashboard...</p>
+      </div>
+    </div>
+  );
+};
+
+export default function Home() {
+  const { status } = useSession();
 
   if (status === "loading") {
     return (
@@ -24,8 +32,8 @@ export default function Home() {
     );
   }
 
-  if (session) {
-    return null; // Will redirect to dashboard
+  if (status === "authenticated") {
+    return <RedirectToDashboard />;
   }
 
   return (
@@ -88,7 +96,7 @@ export default function Home() {
                   </div>
                   <h3 className="mt-8 text-lg font-medium text-gray-900 tracking-tight">Track balances</h3>
                   <p className="mt-5 text-base text-gray-500">
-                    Keep track of who owes what and settle up when it's convenient.
+                    Keep track of who owes what and settle up when it&apos;s convenient.
                   </p>
                 </div>
               </div>
@@ -104,7 +112,7 @@ export default function Home() {
                   </div>
                   <h3 className="mt-8 text-lg font-medium text-gray-900 tracking-tight">Settle up</h3>
                   <p className="mt-5 text-base text-gray-500">
-                    Record payments and settle debts to keep everyone's balance up to date.
+                    Record payments and settle debts to keep everyone&apos;s balance up to date.
                   </p>
                 </div>
               </div>

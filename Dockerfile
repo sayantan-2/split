@@ -1,37 +1,26 @@
-# Build stage
-FROM oven/bun:latest AS builder
+# Use the official Bun image as a base
+FROM oven/bun:latest
 
+# Set the working directory
 WORKDIR /app
 
-# Copy dependencies
+# Copy dependency management files
 COPY bun.lock package.json ./
 
-# Install all dependencies (including dev dependencies needed for build)
+# Install dependencies
 RUN bun install
 
-# Copy app source
+# Copy the rest of the application source code
 COPY . .
 
-# Build with Bun
+# Set NODE_ENV to production for the build
+ENV NODE_ENV=production
+
+# Build the application
 RUN bun run build
 
-# Production stage
-FROM oven/bun:latest AS runner
-
-WORKDIR /app
-
-# Copy dependencies
-COPY bun.lock package.json ./
-
-# Install only production dependencies
-RUN bun install --production
-
-# Copy built application from builder stage
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-
-# Expose app port
+# Expose the port the app runs on
 EXPOSE 3000
 
-# Start with Bun
+# Define the command to run the app
 CMD ["bun", "run", "start"]

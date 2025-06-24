@@ -94,8 +94,14 @@ export default function Dashboard() {
                             </p>
                         </div>
                     </div>
-                </div>
-            </main>
+                </div>            </main>
         </div>
     );
+}
+
+// This prevents static generation and forces server-side rendering
+export async function getServerSideProps() {
+    return {
+        props: {}, // will be passed to the page component as props
+    };
 }

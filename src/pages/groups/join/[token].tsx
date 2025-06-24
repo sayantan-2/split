@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -11,15 +11,31 @@ interface InvitationDetails {
 }
 
 export default function JoinGroup() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
   const { token } = router.query;
-  
+
   const [invitation, setInvitation] = useState<InvitationDetails | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [joining, setJoining] = useState(false);
+  const [loading, setLoading] = useState(true); const [joining, setJoining] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+
+  const fetchInvitationDetails = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/groups/invitation-details?token=${token}`);
+      const data = await response.json();
+
+      if (response.ok) {
+        setInvitation(data);
+      } else {
+        setError(data.error || "Invalid invitation");
+      }
+    } catch {
+      setError("Failed to load invitation details");
+    } finally {
+      setLoading(false);
+    }
+  }, [token]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -30,24 +46,7 @@ export default function JoinGroup() {
     if (status === "authenticated" && token) {
       fetchInvitationDetails();
     }
-  }, [status, token, router]);
-
-  const fetchInvitationDetails = async () => {
-    try {
-      const response = await fetch(`/api/groups/invitation-details?token=${token}`);
-      const data = await response.json();
-
-      if (response.ok) {
-        setInvitation(data);
-      } else {
-        setError(data.error || "Invalid invitation");
-      }
-    } catch (error) {
-      setError("Failed to load invitation details");
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [status, token, router, fetchInvitationDetails]);
 
   const handleJoinGroup = async () => {
     setJoining(true);
@@ -72,7 +71,7 @@ export default function JoinGroup() {
       } else {
         setError(data.error || "Failed to join group");
       }
-    } catch (error) {
+    } catch {
       setError("An error occurred while joining the group");
     } finally {
       setJoining(false);
@@ -141,7 +140,7 @@ export default function JoinGroup() {
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Join Group</h2>
-          
+
           {invitation && (
             <div className="text-left mb-6">
               <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -152,7 +151,7 @@ export default function JoinGroup() {
               )}
               <div className="bg-gray-50 rounded-lg p-4">
                 <p className="text-sm text-gray-600">
-                  You've been invited by <span className="font-medium">{invitation.inviterName}</span>
+                  You&apos;ve been invited by <span className="font-medium">{invitation.inviterName}</span>
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
                   Invitation expires: {new Date(invitation.expiresAt).toLocaleDateString()}
@@ -175,16 +174,22 @@ export default function JoinGroup() {
             >
               {joining ? "Joining..." : "Join Group"}
             </button>
-            
+
             <Link
               href="/dashboard"
               className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
             >
               Cancel
             </Link>
-          </div>
-        </div>
+          </div>        </div>
       </div>
     </div>
   );
+}
+
+// This prevents static generation and forces server-side rendering
+export async function getServerSideProps() {
+    return {
+        props: {}, // will be passed to the page component as props
+    };
 }
