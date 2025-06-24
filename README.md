@@ -1,40 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# 💰 Splitwise Clone
 
-## Getting Started
+A modern expense splitting application built with Next.js, allowing you to easily track shared expenses and settle up with friends, family, and roommates.
 
-First, run the development server:
+## ✨ Features
+
+- 👥 **Group Management** - Create and manage expense groups
+- 💸 **Split Expenses** - Split bills equally or by custom amounts
+- 📊 **Balance Tracking** - Keep track of who owes what
+- 🔐 **Secure Authentication** - User registration and login
+- 📱 **Responsive Design** - Works on desktop and mobile
+- 🐳 **Docker Ready** - Easy deployment with Docker
+
+## 🚀 Quick Start (5 minutes)
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# 1. Clone and setup
+git clone <your-repo-url>
+cd splitwise-clone
+cp .env.example .env
+
+# 2. Start database
+docker-compose -f docker-compose.dev.yml up -d
+
+# 3. Install and run
+bun install
+bun run db:push
+bun run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit `http://localhost:3000` and start splitting expenses! 🎉
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## 🛠️ Tech Stack
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+- **Frontend:** Next.js 15, React 19, TypeScript, Tailwind CSS
+- **Backend:** Next.js API Routes, NextAuth.js
+- **Database:** PostgreSQL with Drizzle ORM
+- **Runtime:** Bun
+- **Deployment:** Docker & Docker Compose
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+## 📖 Documentation
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+For detailed setup instructions, deployment guides, and development options:
 
-## Learn More
+👉 **[Read the Setup Guide](./Docs/SETUP.md)**
 
-To learn more about Next.js, take a look at the following resources:
+The setup guide covers:
+- Multiple development environments (hybrid, Docker, local)
+- Production deployment
+- Database management
+- Troubleshooting tips
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+## 🔧 Available Scripts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+bun run dev          # Start development server
+bun run build        # Create production build
+bun run start        # Start production server
+bun run lint         # Run ESLint
+bun run db:push      # Push database schema
+bun run db:studio    # Open Drizzle Studio
+```
 
-## Deploy on Vercel
+## 🤝 Contributing
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Inspired by [Splitwise](https://www.splitwise.com/)
+- Built with [Next.js](https://nextjs.org/)
+- Database powered by [Drizzle ORM](https://orm.drizzle.team/)
+
+---
+
+**Need help?** Check out the [Setup Guide](./SETUP.md) or open an issue!
