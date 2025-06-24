@@ -6,24 +6,24 @@
 <summary><strong>Step 1: Environment Setup</strong> - Duration: 2-3 days</summary>
 
 ### 1.1 Initialize Next.js Project
-- [ ] Create new Next.js project with TypeScript
+- [x] Create new Next.js project with TypeScript
 ```bash
 npx create-next-app@latest splitwise-clone --typescript --tailwind --eslint --app
 cd splitwise-clone
 ```
 
 ### 1.2 Setup Development Tools
-- [ ] Configure ESLint and Prettier
-- [ ] Setup Husky for git hooks
-- [ ] Configure TypeScript strict mode
-- [ ] Install additional dependencies:
+- [x] Configure ESLint and Prettier
+- [x] Setup Husky for git hooks
+- [x] Configure TypeScript strict mode
+- [x] Install additional dependencies:
 ```bash
 npm install @types/node @types/react @types/react-dom
 npm install -D husky lint-staged prettier
 ```
 
 ### 1.3 Docker Configuration
-- [ ] Create `docker-compose.yml`:
+- [x] Create `docker-compose.yml`:
 ```yaml
 version: '3.8'
 services:
@@ -51,7 +51,7 @@ volumes:
   postgres_data:
 ```
 
-- [ ] Create `Dockerfile`:
+- [x] Create `Dockerfile`:
 ```dockerfile
 FROM node:18-alpine
 WORKDIR /app
@@ -69,18 +69,18 @@ CMD ["npm", "start"]
 <summary><strong>Step 2: Database Setup</strong> - Duration: 2-3 days</summary>
 
 ### 2.1 Install Database Dependencies
-- [ ] Install database packages
+- [x] Install database packages
 ```bash
 npm install drizzle-orm postgres
 npm install -D drizzle-kit @types/pg
 ```
 
 ### 2.2 Database Schema Design
-- [ ] Create `src/db/schema.ts` with users table
-- [ ] Create groups table schema
-- [ ] Create expenses table schema
-- [ ] Create group_members table schema
-- [ ] Create settlements table schema
+- [x] Create `src/db/schema.ts` with users table
+- [x] Create groups table schema
+- [x] Create expenses table schema
+- [x] Create group_members table schema
+- [x] Create settlements table schema
 ```typescript
 // Users table
 export const users = pgTable('users', {
@@ -108,14 +108,14 @@ export const groups = pgTable('groups', {
 ```
 
 ### 2.3 Database Connection Setup
-- [ ] Create `src/db/index.ts` for database connection configuration
-- [ ] Setup environment variables for database connection
-- [ ] Test database connection
+- [x] Create `src/db/index.ts` for database connection configuration
+- [x] Setup environment variables for database connection
+- [x] Test database connection
 
 ### 2.4 Migration Setup
-- [ ] Configure Drizzle migrations
-- [ ] Create initial migration
-- [ ] Test migration process
+- [x] Configure Drizzle migrations
+- [x] Create initial migration
+- [x] Test migration process
 
 </details>
 
@@ -123,23 +123,23 @@ export const groups = pgTable('groups', {
 <summary><strong>Step 3: Authentication System</strong> - Duration: 3-4 days</summary>
 
 ### 3.1 NextAuth.js Setup
-- [ ] Install NextAuth packages
+- [x] Install NextAuth packages
 ```bash
 npm install next-auth @auth/drizzle-adapter
 npm install @auth/core
 ```
 
 ### 3.2 Authentication Configuration
-- [ ] Configure NextAuth with email/password provider
-- [ ] Setup Drizzle adapter for NextAuth
-- [ ] Create authentication pages (login, register, verify)
-- [ ] Implement middleware for protected routes
+- [x] Configure NextAuth with email/password provider
+- [x] Setup Drizzle adapter for NextAuth
+- [x] Create authentication pages (login, register, verify)
+- [x] Implement middleware for protected routes
 
 ### 3.3 User Management
-- [ ] Create user registration flow
-- [ ] Implement email verification
-- [ ] Setup password reset functionality
-- [ ] Create user profile management
+- [x] Create user registration flow
+- [x] Implement email verification
+- [x] Setup password reset functionality
+- [x] Create user profile management
 
 </details>
 
@@ -149,16 +149,16 @@ npm install @auth/core
 <summary><strong>Step 4: Group Management</strong> - Duration: 1 week</summary>
 
 ### 4.1 Group CRUD Operations
-- [ ] Create group creation form and API
-- [ ] Implement group listing and details
-- [ ] Setup group member invitation system
-- [ ] Create group settings and management
+- [x] Create group creation form and API
+- [x] Implement group listing and details
+- [x] Setup group member invitation system
+- [x] Create group settings and management
 
 ### 4.2 Member Management
-- [ ] Implement member invitation via email
-- [ ] Create join group functionality
-- [ ] Setup member role management
-- [ ] Add leave group functionality
+- [x] Implement member invitation via email
+- [x] Create join group functionality
+- [x] Setup member role management
+- [x] Add leave group functionality
 
 </details>
 
@@ -166,22 +166,22 @@ npm install @auth/core
 <summary><strong>Step 5: Expense Management</strong> - Duration: 2 weeks</summary>
 
 ### 5.1 Expense Creation
-- [ ] Design expense creation form
-- [ ] Implement expense validation
-- [ ] Create expense API endpoints
-- [ ] Setup expense categories
+- [x] Design expense creation form
+- [x] Implement expense validation
+- [x] Create expense API endpoints
+- [x] Setup expense categories
 
 ### 5.2 Expense Splitting Logic
-- [ ] Implement equal split functionality
-- [ ] Create split calculation algorithms
-- [ ] Setup expense split validation
-- [ ] Design split preview interface
+- [x] Implement equal split functionality
+- [x] Create split calculation algorithms
+- [x] Setup expense split validation
+- [x] Design split preview interface
 
 ### 5.3 Expense Display
-- [ ] Create expense list component
-- [ ] Implement expense filtering and search
-- [ ] Setup expense detail view
-- [ ] Add expense editing functionality
+- [x] Create expense list component
+- [x] Implement expense filtering and search
+- [x] Setup expense detail view
+- [x] Add expense editing functionality
 
 </details>
 
