@@ -15,7 +15,7 @@ A modern expense splitting application built with Next.js, allowing you to easil
 
 ```bash
 # 1. Clone and setup
-git clone <your-repo-url>
+git clone https://github.com/sayantan-2/split.git
 cd splitwise-clone
 cp .env.example .env
 
