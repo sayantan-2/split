@@ -1,351 +1,247 @@
 # Development Environment Setup Guide
 
-This guide covers different approaches for setting up your development and production environments for the Splitwise Clone project.
+Simple guide to get your Splitwise Clone project running locally and in production.
 
-## 🚀 Quick Start (Recommended for Development)
-
-**Hybrid Development Setup** - Database in Docker, App running locally:
+## 🚀 Quick Start (5 minutes)
 
 ```bash
-# 1. Start the database
-docker-compose -f docker-compose.dev.yml up -d
-
-# 2. Set up environment variables
+# 1. Copy environment template
 cp .env.example .env
 
-# 3. Install dependencies
+# 2. Start database
+docker-compose -f docker-compose.dev.yml up -d
+
+# 3. Install dependencies and run
 bun install
-
-# 4. Run database migrations (if any)
 bun run db:push
-
-# 5. Start development server
 bun run dev
-
-# 6. In a second terminal, start Drizzle Studio
-bun run db:studio
 ```
 
-Your app will be available at `http://localhost:3000`
+Your app will be available at `http://localhost:3000` ✨
 
 ---
 
-## 📋 Development Options
+## 📋 Choose Your Setup
 
-### Option 1: Hybrid Development (Recommended)
+<details>
+<summary><strong>🔧 Option 1: Hybrid Development (Recommended)</strong></summary>
 
-**Best for:** Daily development work, debugging, and fast iteration cycles.
+**Best for:** Daily development work and fast iteration.
 
-This approach runs the database in Docker but your Next.js app locally for faster development.
+Database runs in Docker, your app runs locally for hot reload.
 
-#### Setup Steps:
-
-1. **Start only the database:**
-   ```bash
-   docker-compose -f docker-compose.dev.yml up -d
-   ```
-
-2. **Set up environment variables:**
-   ```bash
-   cp .env.example .env.local
-   # OR rename .env.local to .env for Drizzle Studio compatibility
-   ```
-
-3. **Install dependencies:**
-   ```bash
-   bun install
-   ```
-
-4. **Run database migrations (if you have any):**
-   ```bash
-   bun run db:push
-   ```
-
-5. **Start the development server:**
-   ```bash
-   bun run dev
-   ```
-
-6. **Open Drizzle Studio (in a second terminal):**
-   ```bash
-   bun run db:studio
-   ```
-   Access at `http://localhost:4983` for database management
-
-#### How Database Connection Works:
-- Database runs in Docker container on port 5432
-- Docker maps container port to `localhost:5432` on your machine
-- Your local Next.js app connects to `DATABASE_URL=postgresql://postgres:password@localhost:5432/splitwise_db`
-- ✅ **You CAN access the Docker database from your local app!**
-
-#### Daily Development Workflow:
+### Setup:
 ```bash
-# Terminal 1: Start your day
+# 1. Environment
+cp .env.example .env
+
+# 2. Start database only
+docker-compose -f docker-compose.dev.yml up -d
+
+# 3. Install and run
+bun install
+bun run db:push
+bun run dev
+```
+
+### Optional - Database Management:
+```bash
+# In another terminal
+bun run db:studio
+# Access at http://localhost:4983
+```
+
+### Daily workflow:
+```bash
+# Start your day
 docker-compose -f docker-compose.dev.yml up -d
 bun run dev
 
-# Terminal 2: Start Drizzle Studio (optional, for database management)
-bun run db:studio
-
-# Make code changes - they're reflected immediately with hot reload
-# No need to rebuild Docker containers!
-
-# End of day
+# End your day
 docker-compose -f docker-compose.dev.yml down
 ```
 
-#### Database Management:
-- **Drizzle Studio**: Access at `http://localhost:4983` for visual database management
-- **Direct SQL**: Use the commands in the Useful Commands section below
+**✅ Benefits:** Fast hot reload, easy debugging, no rebuilds needed
 
-#### Benefits:
-- ✅ **Fast hot reload and development**
-- ✅ **Direct debugging capabilities**
-- ✅ **Consistent database environment**
-- ✅ **Easy file editing and IDE integration**
-- ✅ **No Docker rebuilds needed for code changes**
+</details>
 
----
+<details>
+<summary><strong>🐳 Option 2: Full Docker</strong></summary>
 
-### Option 2: Full Docker Development
+**Best for:** Production-like testing and team consistency.
 
-**Best for:** Testing production-like environment, team consistency, complete isolation.
+Everything runs in Docker containers.
 
-Use the original `docker-compose.yml` to run everything in containers.
-
-#### Setup Steps:
-
-1. **Start everything (development mode):**
-   ```bash
-   docker-compose up --build
-   ```
-
-#### Development Workflow with Docker:
+### Setup:
 ```bash
-# After making code changes, you need to rebuild:
+# 1. Environment
+cp .env.example .env
+# Edit .env with your values
+
+# 2. Run everything
+docker-compose up --build
+```
+
+### After code changes:
+```bash
 docker-compose down
 docker-compose up --build
-
-# Or rebuild specific service:
-docker-compose build app
-docker-compose up
 ```
 
-#### Database Management with Full Docker:
-Since both the app and database are running in Docker, you have these options for database management:
-
-**Option A: Run Drizzle Studio from Host (Recommended)**
+### Database Management:
 ```bash
-# In a new terminal, run Drizzle Studio locally
-# It will connect to the Docker database via localhost:5432
+# Option A: Run Drizzle Studio locally (recommended)
 bun run db:studio
-```
-Access at `http://localhost:4983`
+# Access at http://localhost:4983
 
-**Option B: Run Drizzle Studio inside Docker Container**
-```bash
-# Execute Drizzle Studio inside the app container
-docker-compose exec app bun run db:studio
-```
-Then port-forward to access it: `docker-compose exec app bun run db:studio` will run inside the container but you'll need to modify docker-compose.yml to expose port 4983.
-
-**Option C: Direct Database Access**
-```bash
-# Connect directly to the PostgreSQL database
+# Option B: Direct database access
 docker exec -it splitwise_clone-db-1 psql -U postgres -d splitwise_db
 ```
 
-#### Benefits:
-- ✅ **Complete environment isolation**
-- ✅ **Production-like setup**
-- ✅ **Consistent across all team members**
-- ✅ **No local dependencies needed**
+**✅ Benefits:** Complete isolation, production-like environment
+**❌ Drawbacks:** Slower development, rebuilds needed for changes
 
-#### Drawbacks:
-- ❌ **Slower development cycle (rebuild needed for changes)**
-- ❌ **More complex debugging**
-- ❌ **File watching issues on some systems**
-- ❌ **Higher resource usage**
+</details>
 
----
+<details>
+<summary><strong>💻 Option 3: Local Everything</strong></summary>
 
-### Option 3: Local Everything
+**Best for:** No Docker dependencies, fastest development.
 
-**Best for:** Simple setup, no Docker dependencies, debugging database queries.
+PostgreSQL and app both run locally.
 
-Install PostgreSQL locally and run everything on your machine.
-
-#### Setup Steps:
-
-1. **Install PostgreSQL locally** (Windows, macOS, or Linux)
-2. **Create database:**
-   ```sql
-   CREATE DATABASE splitwise_db;
-   CREATE USER postgres WITH PASSWORD 'password';
-   GRANT ALL PRIVILEGES ON DATABASE splitwise_db TO postgres;
-   ```
-3. **Update .env:**
-   ```
-   DATABASE_URL=postgresql://postgres:password@localhost:5432/splitwise_db
-   ```
-   **Note**: Use `.env` (not `.env.local`) for Drizzle Studio compatibility
-4. **Install dependencies and run:**
-   ```bash
-   bun install
-   bun run db:push
-   bun run dev
-   ```
-
-#### Benefits:
-- ✅ **Fastest development cycle**
-- ✅ **Direct database access for debugging**
-- ✅ **No Docker overhead**
-
-#### Drawbacks:
-- ❌ **Need to install PostgreSQL locally**
-- ❌ **Less consistent across team members**
-- ❌ **Database state not easily reset**
-
----
-
-## 🏗️ Production Build & Deployment
-
-### Local Production Build
-
-Build optimized version locally:
-
+### Setup:
 ```bash
-# Create optimized production build
-bun run build
+# 1. Install PostgreSQL locally
+# Windows: Download from postgresql.org
+# macOS: brew install postgresql
+# Ubuntu: sudo apt install postgresql
 
-# Test the production build locally
-bun run start
-```
+# 2. Create database
+psql -U postgres
+CREATE DATABASE splitwise_db;
+CREATE USER postgres WITH PASSWORD 'password';
+GRANT ALL PRIVILEGES ON DATABASE splitwise_db TO postgres;
+\q
 
-### Docker Production Build
-
-Build and run optimized version in Docker:
-
-```bash
-# Copy environment variables template
-cp .env.docker .env.docker.local
-
-# Edit .env.docker.local with your production values
-# IMPORTANT: Never commit .env.docker.local to version control!
-
-# Build and start production containers
-NEXTAUTH_SECRET=$(cat .env.docker.local | grep NEXTAUTH_SECRET | cut -d'=' -f2) \
-NEXTAUTH_URL=$(cat .env.docker.local | grep NEXTAUTH_URL | cut -d'=' -f2) \
-docker-compose up --build
-
-# Or set environment variables and run
-export NEXTAUTH_SECRET="your-secret-here"
-export NEXTAUTH_URL="http://localhost:3000"
-docker-compose up --build
-
-# Or use an env file (recommended)
-docker-compose --env-file .env.docker.local up --build
-```
-
-#### Key Differences:
-- **`bun run build`** = Creates optimized build locally (in `.next` folder)
-- **`docker-compose up --build`** = Creates optimized build inside Docker container
-- Both produce the same optimized production build, just in different environments
-
-### Production Deployment Workflow:
-
-```bash
-# 1. Test your changes locally first (Option 1)
-docker-compose -f docker-compose.dev.yml up -d
+# 3. Environment and run
+cp .env.example .env
+# Edit DATABASE_URL if needed
+bun install
+bun run db:push
 bun run dev
+```
 
-# 2. Create production build to test
+**✅ Benefits:** Fastest development, no Docker overhead
+**❌ Drawbacks:** Need PostgreSQL installed, less consistent setup
+
+</details>
+
+---
+
+## 🚀 Production Deployment
+
+<details>
+<summary><strong>🏗️ Production Build & Deploy</strong></summary>
+
+### Local Production Test:
+```bash
+# Test production build locally
 bun run build
 bun run start
+```
 
-# 3. Deploy with Docker (production)
+### Docker Production Deploy:
+```bash
+# 1. Setup environment
+cp .env.example .env
+# Edit .env with production values:
+# - NODE_ENV=production
+# - Real NEXTAUTH_SECRET
+# - Production NEXTAUTH_URL
+# - Production DATABASE_URL
+
+# 2. Deploy
 docker-compose up --build -d
 ```
+
+### Environment Variables for Production:
+```bash
+# Required production values in .env:
+DATABASE_URL=postgresql://postgres:password@db:5432/splitwise_db
+NODE_ENV=production
+NEXTAUTH_SECRET=your-real-secret-here-64-chars-long
+NEXTAUTH_URL=https://yourdomain.com
+```
+
+</details>
 
 ---
 
 ## 🛠️ Useful Commands
 
-### Database Management:
+<details>
+<summary><strong>📊 Database Commands</strong></summary>
+
 ```bash
-# Start/stop database only
-docker-compose -f docker-compose.dev.yml up -d
-docker-compose -f docker-compose.dev.yml down
+# Database operations
+bun run db:generate    # Generate migrations
+bun run db:push       # Push schema changes
+bun run db:studio     # Open Drizzle Studio
 
-# View database logs
-docker-compose -f docker-compose.dev.yml logs db
+# Docker database
+docker-compose -f docker-compose.dev.yml up -d    # Start DB
+docker-compose -f docker-compose.dev.yml down     # Stop DB
+docker-compose -f docker-compose.dev.yml logs db  # View logs
 
-# Connect to database directly
+# Direct database access
 docker exec -it splitwise_clone-db-1 psql -U postgres -d splitwise_db
 ```
 
-### Development:
-```bash
-# Install new packages
-bun add package-name
-bun add -d package-name  # dev dependency
+</details>
 
-# Database operations
-bun run db:generate      # Generate migrations
-bun run db:push         # Push schema to database
-bun run db:studio       # Open Drizzle Studio
+<details>
+<summary><strong>🐳 Docker Commands</strong></summary>
+
+```bash
+# Container management
+docker ps                    # View running containers
+docker ps -a                 # View all containers
+docker-compose down -v       # Stop and remove volumes
+docker-compose logs app      # View app logs
+docker-compose logs db       # View database logs
+
+# Rebuilding
+docker-compose build app     # Rebuild app only
+docker-compose up --build    # Rebuild and start
+```
+
+</details>
+
+<details>
+<summary><strong>📦 Development Commands</strong></summary>
+
+```bash
+# Package management
+bun add package-name         # Install package
+bun add -d package-name      # Install dev dependency
+bun install                  # Install all dependencies
 
 # Code quality
-bun run lint            # Run ESLint
+bun run lint                 # Run ESLint
+bun run build               # Create production build
+bun run start               # Start production server
 ```
 
-### Docker:
-```bash
-# View running containers
-docker ps
-
-# View all containers
-docker ps -a
-
-# Remove containers and volumes
-docker-compose down -v
-
-# Rebuild specific service
-docker-compose build app
-
-# View logs
-docker-compose logs app
-docker-compose logs db
-```
+</details>
 
 ---
 
-## 🎯 Recommended Workflow
+## 🎯 Which Option Should I Choose?
 
-**For Development:** Use **Option 1 (Hybrid)**
-- Fast development cycles
-- Easy debugging
-- Consistent database
+- **New to project?** → Start with **Option 1 (Hybrid)**
+- **Team development?** → Use **Option 1 (Hybrid)** for daily work
+- **Testing deployment?** → Use **Option 2 (Full Docker)**
+- **No Docker?** → Use **Option 3 (Local Everything)**
 
-**For Production Testing:** Use **Option 2 (Full Docker)**
-- Test complete containerized setup
-- Verify production configuration
-
-**Commands Summary:**
-```bash
-# Development (daily workflow)
-# Terminal 1:
-docker-compose -f docker-compose.dev.yml up -d
-bun run dev
-
-# Terminal 2 (optional, for database management):
-bun run db:studio
-
-# Production build testing
-docker-compose up --build
-
-# Production deployment
-docker-compose up --build -d
-```
-
-This gives you the best of both worlds: **fast development** with **reliable production deployment**.
+**Most developers use Option 1 for development and Option 2 for production testing.** 🚀

@@ -2,60 +2,50 @@
 
 ## ✅ SAFE TO COMMIT - Security Audit Passed
 
-### Environment Files Status:
-- **`.env.example`** ✅ Safe - Contains only placeholder values and comments
-- **`.env.docker`** ✅ Safe - Contains only placeholder values for templates
-- **`.env`** ❌ IGNORED - Contains real secrets, properly excluded by .gitignore
-- **`.env.docker.local`** ❌ IGNORED - For real secrets, properly excluded by .gitignore
+### Simplified Environment Setup:
+- **`.env.example`** ✅ Safe - Template with placeholder values (gets committed)
+- **`.env`** ❌ IGNORED - Contains real secrets (git-ignored, never commit this)
 
 ### Ignore Files Status:
-- **`.gitignore`** ✅ Comprehensive - Excludes all environment files with secrets
-- **`.dockerignore`** ✅ Comprehensive - Prevents secrets from being copied to containers
+- **`.gitignore`** ✅ Comprehensive - Excludes .env and all .env.*.local files
+- **`.dockerignore`** ✅ Comprehensive - Prevents .env from being copied to containers
 
 ### Configuration Files Status:
 - **`docker-compose.yml`** ✅ Safe - Uses environment variable placeholders
 - **`docker-compose.dev.yml`** ✅ Safe - Uses development-only credentials
-- **`package.json`** ✅ Safe - No secrets
 - **Source code files** ✅ Safe - No hardcoded secrets found
 
-### Files Excluded from Version Control:
-```
-.env                    # Local development secrets
-.env.local             # Local environment overrides
-.env.development.local # Development-specific secrets
-.env.test.local        # Test-specific secrets
-.env.production.local  # Production-specific secrets
-.env.*.local           # Any environment-specific secrets
-.env.docker.local      # Docker deployment secrets
-```
+### Simple Setup Instructions:
 
-### Files Safe to Commit:
-```
-.env.example           # Template with placeholder values
-.env.docker            # Template with placeholder values
-.gitignore             # Protects secrets
-.dockerignore          # Protects secrets
-docker-compose.yml     # Uses environment variables
-docker-compose.dev.yml # Development-only credentials
+**For new developers:**
+```bash
+# 1. Copy template
+cp .env.example .env
+
+# 2. Edit .env with your actual values
+# (This file is automatically git-ignored)
+
+# 3. Run locally (hybrid mode)
+docker-compose -f docker-compose.dev.yml up -d
+bun run dev
+
+# OR run everything in Docker
+docker-compose up
 ```
 
-## Production Deployment Instructions:
+**For production deployment:**
+```bash
+# 1. Create production .env file
+cp .env.example .env
 
-1. **Copy template file:**
-   ```bash
-   cp .env.docker .env.docker.local
-   ```
+# 2. Edit .env with production values:
+#    - Set NODE_ENV=production
+#    - Set real NEXTAUTH_SECRET
+#    - Set production NEXTAUTH_URL
+#    - Use production DATABASE_URL
 
-2. **Edit with real values:**
-   ```bash
-   # Replace placeholder values in .env.docker.local
-   NEXTAUTH_SECRET=your-real-secret-here
-   NEXTAUTH_URL=https://your-domain.com
-   ```
-
-3. **Deploy:**
-   ```bash
-   docker-compose --env-file .env.docker.local up -d
-   ```
+# 3. Deploy
+docker-compose up -d
+```
 
 ## ✅ ALL CLEAR - Ready to commit!
