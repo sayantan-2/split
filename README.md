@@ -71,7 +71,9 @@ bun run db:studio    # Open Drizzle Studio
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License - see the [LICENSE](LICENSE) file for details.
+
+**Note:** This project is for educational and personal use only. Commercial use is not permitted.
 
 ## 🙏 Acknowledgments
 
